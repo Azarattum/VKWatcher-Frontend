@@ -1,0 +1,15 @@
+{
+    "scripts": {
+        "build:html": "pug ./src -o ./dist -P --basedir ./",
+        "build:js": "tsc",
+        "build:css": "node-sass --recursive ./src/ --output ./dist/",
+        "clean": "cd ./dist & del /S *.include.* & for /f \"delims=\" %d in ('dir /s /b /ad ^| sort /r') do rd \"%d\" /Q",
+
+        "watch:html": "pug ./src -o ./dist -P --basedir ./ -w",
+        "watch:js": "tsc -w",
+        "watch:css": "node-sass --watch --recursive ./src/styles/ --output ./dist/styles/",
+
+        "build": "npm run build:css & npm run build:js & npm run build:html & npm run clean",
+        "watch": "npm-run-all --parallel watch:*"
+    }
+}
