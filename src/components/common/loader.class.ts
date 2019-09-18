@@ -2,7 +2,7 @@
  * Class for async AJAX loading with JSON support.
  */
 export default class Loader {
-	public urls: Array<string>;
+	public urls: string[];
 
 	constructor(urls: Array<string>) {
 		this.urls = urls;

@@ -1,4 +1,5 @@
 import Loader from "./components/common/loader.class.js";
+import Users, { IUsersData } from "./components/app/services/users.service.js"
 
 const URLS = [
     "sessions.json",
@@ -12,5 +13,6 @@ window.addEventListener("load", async () => {
     const loader = new Loader(URLS);
     const data = await loader.load();
 
-    console.log(data);
+    Users.initialize(data[0] as IUsersData);
+    console.log(Users.data);
 });
