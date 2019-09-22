@@ -1,4 +1,4 @@
-import DateUtils from "./utils.class.js"
+import DateUtils from "../../common/utils.class.js"
 import IFilter from "./filters/filter.interface.js";
 import Day from "./day.class.js";
 import Session from "./session.class.js";

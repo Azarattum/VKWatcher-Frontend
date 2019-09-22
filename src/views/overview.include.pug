@@ -1,0 +1,23 @@
+.overview-wrapper
+    canvas#overview-render
+
+    div(style = {top: "-1000px"})#overview-select
+        .line
+        .time
+    
+    .session
+        h2 Session
+        p.date#overview-session-date Not Selected
+        table
+            tr
+                td Duration:
+                td.table-item#overview-session-duration None
+            tr
+                td From:
+                td.table-item#overview-session-from 00:00:00
+            tr
+                td To:
+                td.table-item#overview-session-to 00:00:00
+            tr
+                td Device:
+                td.table-item#overview-session-platform unknown

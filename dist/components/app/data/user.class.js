@@ -1,4 +1,4 @@
-import DateUtils from "./utils.class.js";
+import DateUtils from "../../common/utils.class.js";
 import Day from "./day.class.js";
 /**
  * Represents user with its data

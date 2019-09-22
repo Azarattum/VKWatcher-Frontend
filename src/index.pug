@@ -10,5 +10,41 @@ html(lang="en")
         meta(http-equiv="X-UA-Compatible", content="ie=edge")
         title VKW UI
     body
-        //- Body Here -\\
+        .page
+            //- Top section
+            .head-section
+                .user-info
+                    .name Loading...
+                    .id
+                .user-controlls
+                    .button.filters &#x2699;&#xFE0E;                        
+                        .dropdown
+                            include views/filters.include.pug
+                    .button.users &#9776;
+                        .dropdown
+                            div#users
+                    .button.previous &#9668;
+                    .button.next &#9658;
+            //- Main section
+            .content-secton
+                //- Tab buttons
+                .tab-control
+                    .tab 
+                        .icon.overview
+                    .tab
+                        .icon.chart
+                            i
+                    .tab
+                        .icon.analysis
+
+                .tab-content.overview
+                    include views/overview.include.pug
+                .tab-content.chart
+                    include views/chart.include.pug
+                .tab-content.analysis
+                    include views/chart.include.pug
+            .space
+        footer
+            include /dist/components/vendor/slider/index.include.html
+            include /dist/components/vendor/chart/index.include.html
         

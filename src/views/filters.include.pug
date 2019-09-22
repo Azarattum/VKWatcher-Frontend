@@ -1,0 +1,26 @@
+style
+    include /dist/views/styles/filters.include.css
+
+span.label Filters:
+.filters
+    label.empty-container Empty
+        input(type="checkbox" checked="true")
+        span.empty-checkmark
+
+    select.device
+        option(value="-1").none No Device Filter
+        option(value="1") Mobile
+        option(value="2") iPhone
+        option(value="3") iPad
+        option(value="4") Android
+        option(value="5") WPhone
+        option(value="6") Windows
+        option(value="7") Web
+
+    span.label Period:
+    .period
+        input(type="text").period-slider
+
+    span.label Zoom:
+    .zoom
+        input(type="text").zoom-slider
