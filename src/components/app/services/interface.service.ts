@@ -61,6 +61,12 @@ export default class Interface {
         (<any>window).changeDevice = (id: number) => {
             this.call("devicechanged", id);
         }
+
+        (<any>window).openProfile = (event: MouseEvent) => {
+            const id = (event.target as HTMLElement).textContent;
+            const newWindow = window.open("https://vk.com/id" + id, '_blank');
+            if (newWindow) newWindow.focus();
+        }
     }
 
     public static refresh(days: number[], { from, to }: { from: number, to: number }): void {

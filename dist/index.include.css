@@ -52,19 +52,20 @@ body {
   .head-section > div {
     float: left;
     margin: 16px; }
-  .head-section .user-info .name {
-    font-weight: bold;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden; }
-  .head-section .user-info .id {
-    height: 0.3em;
-    margin-top: calc(2.5em + 16px);
-    margin-left: -8px;
-    font-size: 0.3em;
-    text-decoration: underline;
-    opacity: 0.5;
-    cursor: pointer; }
+  .head-section .user-info {
+    display: inherit; }
+    .head-section .user-info .name {
+      font-weight: bold;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden; }
+    .head-section .user-info .id {
+      height: 0.3em;
+      margin-top: calc(2.5em + 8px);
+      font-size: 0.3em;
+      text-decoration: underline;
+      opacity: 0.5;
+      cursor: pointer; }
   .head-section .user-controlls {
     display: flex;
     position: absolute;

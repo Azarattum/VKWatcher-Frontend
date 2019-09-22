@@ -44,6 +44,12 @@ export default class Interface {
         window.changeDevice = (id) => {
             this.call("devicechanged", id);
         };
+        window.openProfile = (event) => {
+            const id = event.target.textContent;
+            const newWindow = window.open("https://vk.com/id" + id, '_blank');
+            if (newWindow)
+                newWindow.focus();
+        };
     }
     static refresh(days, { from, to }) {
         const sender = this;

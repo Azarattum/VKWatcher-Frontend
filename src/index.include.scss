@@ -72,6 +72,7 @@ body {
 	}
 
 	.user-info {
+		display: inherit;
 		.name {
 			font-weight: bold;
 			white-space: nowrap;
@@ -80,8 +81,7 @@ body {
 		}
 		.id {
 			height: 0.3em;
-			margin-top: calc(2.5em + 16px);
-			margin-left: -8px;
+			margin-top: calc(2.5em + 8px);
 
 			font-size: 0.3em;
 			text-decoration: underline;

@@ -4,7 +4,6 @@ import Hash from "./components/common/hash.class.js";
 import Interface from "./components/app/services/interface.service.js";
 import PeriodFilter from "./components/app/data/filters/period.class.js";
 
-
 window.addEventListener("load", async () => {
     const loader = new Loader(["sessions.json"]);
     const data = await loader.load();
