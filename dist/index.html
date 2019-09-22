@@ -77,7 +77,7 @@
     background-color: white;
     border-radius: 9px;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
-    z-index: 5; }
+    z-index: 15; }
     .head-section .user-controlls .button {
       padding: 8px;
       margin: 0;
@@ -127,7 +127,7 @@
   height: 0px;
   width: max-content;
   right: 0px;
-  top: calc(2em - 8px);
+  top: calc(2em - 4px);
   border-radius: 9px;
   box-shadow: 0px 12px 12px rgba(0, 0, 0, 0.4);
   overflow-x: hidden;
@@ -181,14 +181,45 @@
     </style>
     <script type="module">import Loader from "./components/common/loader.class.js";
 import Users from "./components/app/services/users.service.js";
-const URLS = [
-    "sessions.json",
-];
+import Hash from "./components/common/hash.class.js";
+import Interface from "./components/app/services/interface.service.js";
 window.addEventListener("load", async () => {
-    const loader = new Loader(URLS);
+    const loader = new Loader(["sessions.json"]);
     const data = await loader.load();
     Users.initialize(data[0]);
-    console.log(Users.data);
+    Users.addEventListener("userchanged", () => {
+        const days = Object.keys(Users.selected.days).map(x => +x);
+        const period = Users.selected.getFilter("period");
+        Interface.refresh(days, period);
+    });
+    const defaults = {
+        user: 0,
+        zoom: 1,
+        period: "1-" +
+            Object.values(Users.selected.days).length,
+        device: -1,
+        empty: true,
+        tab: "overview"
+    };
+    Hash.initialize(defaults);
+    Interface.initialize(Users.data.map(x => x.name));
+    Interface.addEventListener("userchanged", (id, relative) => {
+        Users.select(id, relative);
+        Hash.set("user", Users.selectedId);
+    });
+    Interface.addEventListener("periodchanged", (from, to, offset) => {
+        Hash.set("period", from + "-" + to);
+    });
+    Interface.addEventListener("zoomed", (factor) => {
+        Hash.set("zoom", factor);
+    });
+    Interface.addEventListener("devicechanged", (id) => {
+        Hash.set("device", id);
+    });
+    Interface.addEventListener("emptychanged", (value) => {
+        Hash.set("empty", value);
+    });
+    Users.call("userchanged");
 });
 //# sourceMappingURL=index.include.js.map
     </script>
@@ -284,10 +315,11 @@ window.addEventListener("load", async () => {
               </style><span class="label">Filters:</span>
               <div class="filters">
                 <label class="empty-container">Empty
-                  <input type="checkbox" checked="true"/><span class="empty-checkmark"></span>
+                  <input type="checkbox" checked="true" onclick="changeEmpty(event)"/><span class="empty-checkmark"></span>
                 </label>
-                <select class="device">
+                <select class="device" onchange="changeDevice(+this.value)">
                   <option class="none" value="-1">No Device Filter</option>
+                  <option value="0">Unknown</option>
                   <option value="1">Mobile</option>
                   <option value="2">iPhone</option>
                   <option value="3">iPad</option>
@@ -297,10 +329,10 @@ window.addEventListener("load", async () => {
                   <option value="7">Web</option>
                 </select><span class="label">Period:</span>
                 <div class="period">
-                  <input class="period-slider" type="text"/>
+                  <input type="text" id="period-slider"/>
                 </div><span class="label">Zoom:</span>
                 <div class="zoom">
-                  <input class="zoom-slider" type="text"/>
+                  <input type="text" id="zoom-slider"/>
                 </div>
               </div>
             </div>
@@ -310,8 +342,8 @@ window.addEventListener("load", async () => {
               <div id="users"></div>
             </div>
           </div>
-          <div class="button previous">&#9668;</div>
-          <div class="button next">&#9658;</div>
+          <div class="button previous" onclick="changeUser(-1,true)">&#9668;</div>
+          <div class="button next" onclick="changeUser(1,true)">&#9658;</div>
         </div>
       </div>
       <div class="content-secton">
@@ -372,6 +404,7 @@ window.addEventListener("load", async () => {
     </div>
     <footer>
       
+<link rel="stylesheet" href="components/vendor/slider/styles/slider.min.css"/>
 <link rel="stylesheet" href="components/vendor/slider/index.css"/>
 <script src="components/vendor/slider/libs/jquery.min.js"></script>
 <script src="components/vendor/slider/slider.min.js"></script>

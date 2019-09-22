@@ -4,11 +4,12 @@ style
 span.label Filters:
 .filters
     label.empty-container Empty
-        input(type="checkbox" checked="true")
+        input(type="checkbox" checked="true" onclick="changeEmpty(event)")
         span.empty-checkmark
 
-    select.device
+    select.device(onchange="changeDevice(+this.value)")
         option(value="-1").none No Device Filter
+        option(value="0") Unknown
         option(value="1") Mobile
         option(value="2") iPhone
         option(value="3") iPad
@@ -19,8 +20,8 @@ span.label Filters:
 
     span.label Period:
     .period
-        input(type="text").period-slider
+        input(type="text")#period-slider
 
     span.label Zoom:
     .zoom
-        input(type="text").zoom-slider
+        input(type="text")#zoom-slider

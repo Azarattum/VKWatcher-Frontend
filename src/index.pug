@@ -23,8 +23,8 @@ html(lang="en")
                     .button.users &#9776;
                         .dropdown
                             div#users
-                    .button.previous &#9668;
-                    .button.next &#9658;
+                    .button.previous(onclick="changeUser(-1,true)") &#9668;
+                    .button.next(onclick="changeUser(1,true)") &#9658;
             //- Main section
             .content-secton
                 //- Tab buttons

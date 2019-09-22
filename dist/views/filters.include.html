@@ -76,10 +76,11 @@
 </style><span class="label">Filters:</span>
 <div class="filters">
   <label class="empty-container">Empty
-    <input type="checkbox" checked="true"/><span class="empty-checkmark"></span>
+    <input type="checkbox" checked="true" onclick="changeEmpty(event)"/><span class="empty-checkmark"></span>
   </label>
-  <select class="device">
+  <select class="device" onchange="changeDevice(+this.value)">
     <option class="none" value="-1">No Device Filter</option>
+    <option value="0">Unknown</option>
     <option value="1">Mobile</option>
     <option value="2">iPhone</option>
     <option value="3">iPad</option>
@@ -89,9 +90,9 @@
     <option value="7">Web</option>
   </select><span class="label">Period:</span>
   <div class="period">
-    <input class="period-slider" type="text"/>
+    <input type="text" id="period-slider"/>
   </div><span class="label">Zoom:</span>
   <div class="zoom">
-    <input class="zoom-slider" type="text"/>
+    <input type="text" id="zoom-slider"/>
   </div>
 </div>

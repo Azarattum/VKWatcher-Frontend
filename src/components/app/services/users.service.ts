@@ -7,16 +7,11 @@ import Session from "../data/session.class.js";
 export default class Users {
     public static data: User[] = [];
 
-    private static _current: number = 0;
+    private static _selectedId: number = 0;
     private static callbacks: { [type: string]: Function[]; } = {};
 
-    public static get current(): number { return this._current; }
-    public static set current(value: number) {
-        this._current = value;
-        if (this.callbacks["userchanged"]) {
-            this.callbacks["userchanged"].map(x => x());
-        }
-    }
+    public static get selectedId(): number { return this._selectedId; }
+    public static get selected(): User { return this.data[this._selectedId] }
 
     public static initialize(data: IUsersData): void {
         //Iterate through all users in data
@@ -52,15 +47,28 @@ export default class Users {
 
             //Save user to an array
             this.data.push(user);
-            if (this.callbacks["dataupdate"]) {
-                this.callbacks["dataupdate"].map(x => x());
-            }
+            this.call("dataupdated");
         }
     }
 
-    public static addEventListener(type: "dataupdate" | "userchanged", callback: () => {}): void {
+    public static select(id: number, relative: boolean = false): void {
+        if (relative) id += this._selectedId;
+
+        if (this.data[id] && this._selectedId != id) {
+            this._selectedId = id;
+            this.call("userchanged");
+        }
+    }
+
+    public static addEventListener(type: "dataupdated" | "userchanged", callback: Function): void {
         if (!(type in this.callbacks)) this.callbacks[type] = [];
         this.callbacks[type].push(callback);
+    }
+
+    public static call(type: "dataupdated" | "userchanged", ...args: any[]) {
+        if (this.callbacks[type]) {
+            this.callbacks[type].map(x => x.call(x, ...args));
+        }
     }
 }
 

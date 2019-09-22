@@ -1,4 +1,4 @@
-import Hash from "./hash.cls.js";
+import Hash from "../common/hash.class.js";
 import DateUtils from "./data/utils.cls.js";
 import Chart from "./chart/chart.cls.js";
 /**
@@ -18,9 +18,9 @@ export default class Designer {
             type: "double",
             drag_interval: true,
             grid: true,
-            prettify: (value) => {
+            prettify: value => {
                 let date = DateUtils.getDateFromGlobalDay(value).toString();
-                date = date.split(' ');
+                date = date.split(" ");
                 date = date[1] + " " + date[2];
                 return date;
             }
@@ -33,8 +33,9 @@ export default class Designer {
             from: 1,
             onFinish: function (data) {
                 hash.set("zoom", data.from);
-                document.getElementsByClassName("page")[0].
-                    style.setProperty("--vertical-zoom", data.from);
+                document
+                    .getElementsByClassName("page")[0]
+                    .style.setProperty("--vertical-zoom", data.from);
                 dataDrawer.update();
                 dataDrawer.render();
             }
@@ -63,11 +64,14 @@ export default class Designer {
             id = +hash.get("user");
         }
         if (Number.isFinite(+hash.get("zoom"))) {
-            $(".zoom-slider").data("ionRangeSlider").update({
+            $(".zoom-slider")
+                .data("ionRangeSlider")
+                .update({
                 from: +hash.get("zoom")
             });
-            document.getElementsByClassName("page")[0].
-                style.setProperty("--vertical-zoom", +hash.get("zoom"));
+            document
+                .getElementsByClassName("page")[0]
+                .style.setProperty("--vertical-zoom", +hash.get("zoom"));
         }
         if (hash.get("empty") === "false") {
             users[id].getFilter("empty").toggle(true);
@@ -76,10 +80,13 @@ export default class Designer {
         if (Number.isInteger(+hash.get("device"))) {
             users[id].getFilter("device").device = +hash.get("device");
         }
-        if (hash.exists("period") && hash.get("period").split('-').length == 2) {
+        if (hash.exists("period") &&
+            hash.get("period").split("-").length == 2) {
             const days = Object.keys(users[id].days);
-            users[id].getFilter("period").from = +days[0] + (+hash.get("period").split('-')[0]) - 1;
-            users[id].getFilter("period").to = +days[0] + (+hash.get("period").split('-')[1]) - 1;
+            users[id].getFilter("period").from =
+                +days[0] + +hash.get("period").split("-")[0] - 1;
+            users[id].getFilter("period").to =
+                +days[0] + +hash.get("period").split("-")[1] - 1;
         }
         if (document.getElementsByClassName("tab-" + hash.get("tab")).length > 0) {
             tab(hash.get("tab"), true);

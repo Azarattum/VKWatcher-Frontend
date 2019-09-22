@@ -3,78 +3,72 @@
  */
 export default class Hash {
     /**
-     * Creates URL Hash object
+     * Initializes URL Hash object
      * @param {Object} defaults Default values for hash
      */
-    constructor(defaults) {
-        let hash = window.location.hash;
+    static initialize(defaults) {
         for (const key in defaults) {
             if (this.exists(key)) {
                 continue;
             }
             const value = defaults[key];
-            this.set(key, value);
+            this.set(key, value.toString());
         }
     }
-
     /**
      * Returns the value of hash property
-     * @param {String} propertyName Name of a property
+     * @param {String} property Name of property
      */
-    get(propertyName) {
-        this._validateString(propertyName);
-        const properties = window.location.hash.slice(1).split(',');
+    static get(property) {
+        this.validateString(property);
+        const properties = window.location.hash.slice(1).split(",");
         for (const property of properties) {
-            const key = property.split(':')[0];
+            const key = property.split(":")[0];
             //Find property with given name
-            if (key.toLocaleLowerCase() == propertyName.toLocaleLowerCase()) {
+            if (key.toLocaleLowerCase() == property.toLocaleLowerCase()) {
                 //Return the value
-                return property.split(':')[1];
+                return property.split(":")[1];
             }
         }
         return null;
     }
-
     /**
      * Sets the value of hash property
      * @param {String} propertyName Name of a property
      */
-    set(propertyName, propertyValue) {
+    static set(property, value) {
+        value = value.toString();
         let hash = window.location.hash;
-        this._validateString(propertyName);
-        this._validateString(propertyValue);
+        this.validateString(property);
+        this.validateString(value);
         //Add value to hash if it does not exist
-        if (!this.exists(propertyName)) {
+        if (!this.exists(property)) {
             if (!hash.trim().endsWith(",") && hash != "" && hash != "#") {
                 window.location.hash += ",";
             }
-            window.location.hash += propertyName + ":" + propertyValue;
+            window.location.hash += property + ":" + value;
         }
-
         //Replace an existing value
-        let regexp = new RegExp(propertyName + ":([^,]*|$)");
-        window.location.hash = window.location.hash.replace(regexp,
-            propertyName + ":" + propertyValue);
+        let regexp = new RegExp(property + ":([^,]*|$)");
+        window.location.hash = window.location.hash.replace(regexp, property + ":" + value);
     }
-
     /**
      * Checks whethe the property exists or not
-     * @param {String} string Property name
+     * @param {String} property Property name
      */
-    exists(propertyName) {
+    static exists(property) {
         const hash = window.location.hash;
-        return (hash.toLowerCase().indexOf(propertyName.toLowerCase() + ":") != -1);
+        return (hash.toLowerCase().indexOf(property.toLowerCase() + ":") != -1);
     }
-
     /**
      * Raises an exception if the strings contains illegal characters
      * @param {String} string String to check
      */
-    _validateString(string) {
-        if (string.toString().indexOf(',') != -1 ||
-            string.toString().indexOf(':') != -1
-        ) {
+    static validateString(string) {
+        if (string.toString().indexOf(",") != -1 ||
+            string.toString().indexOf(":") != -1) {
             throw new Error("Illegal characters in property!");
         }
     }
 }
+//# sourceMappingURL=hash.class.js.map

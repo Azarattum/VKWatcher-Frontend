@@ -4,13 +4,8 @@ import PeriodFilter from "../data/filters/period.class.js";
 import User from "../data/user.class.js";
 import Session from "../data/session.class.js";
 export default class Users {
-    static get current() { return this._current; }
-    static set current(value) {
-        this._current = value;
-        if (this.callbacks["userchanged"]) {
-            this.callbacks["userchanged"].map(x => x());
-        }
-    }
+    static get selectedId() { return this._selectedId; }
+    static get selected() { return this.data[this._selectedId]; }
     static initialize(data) {
         //Iterate through all users in data
         for (const id in data) {
@@ -38,9 +33,15 @@ export default class Users {
             user.addFilter(period);
             //Save user to an array
             this.data.push(user);
-            if (this.callbacks["dataupdate"]) {
-                this.callbacks["dataupdate"].map(x => x());
-            }
+            this.call("dataupdated");
+        }
+    }
+    static select(id, relative = false) {
+        if (relative)
+            id += this._selectedId;
+        if (this.data[id] && this._selectedId != id) {
+            this._selectedId = id;
+            this.call("userchanged");
         }
     }
     static addEventListener(type, callback) {
@@ -48,8 +49,13 @@ export default class Users {
             this.callbacks[type] = [];
         this.callbacks[type].push(callback);
     }
+    static call(type, ...args) {
+        if (this.callbacks[type]) {
+            this.callbacks[type].map(x => x.call(x, ...args));
+        }
+    }
 }
 Users.data = [];
-Users._current = 0;
+Users._selectedId = 0;
 Users.callbacks = {};
 //# sourceMappingURL=users.service.js.map

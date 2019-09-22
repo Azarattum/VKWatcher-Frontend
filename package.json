@@ -9,5 +9,8 @@
 		"watch:html": "pug ./src -o ./dist -P --basedir ./ -w",
 		"watch:js": "tsc -w",
 		"watch:css": "node-sass --watch --recursive ./src/ --output ./dist/"
+	},
+	"dependencies": {
+		"@types/jquery": "^3.3.31"
 	}
 }
