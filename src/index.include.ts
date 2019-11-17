@@ -5,6 +5,17 @@ import Interface from "./components/app/services/interface.service.js";
 import PeriodFilter from "./components/app/data/filters/period.class.js";
 
 window.addEventListener("load", async () => {
+    await initialize();
+    Users.call("userchanged");
+});
+
+async function initialize() {
+    initializeData();
+    initializeHash();
+    initializeInterface();
+}
+
+async function initializeData() {
     const loader = new Loader(["sessions.json"]);
     const data = await loader.load();
 
@@ -14,7 +25,9 @@ window.addEventListener("load", async () => {
         const period = Users.selected.getFilter("period") as PeriodFilter;
         Interface.refresh(days, period);
     });
+}
 
+async function initializeHash() {
     const defaults = {
         user: 0,
         zoom: 1,
@@ -25,7 +38,9 @@ window.addEventListener("load", async () => {
         tab: "overview"
     };
     Hash.initialize(defaults);
+}
 
+async function initializeInterface() {
     Interface.initialize(Users.data.map(x => x.name));
     Interface.addEventListener("userchanged", (id: number, relative?: boolean) => {
         Users.select(id, relative);
@@ -43,6 +58,4 @@ window.addEventListener("load", async () => {
     Interface.addEventListener("emptychanged", (value: boolean) => {
         Hash.set("empty", value);
     });
-
-    Users.call("userchanged");
-});
+}

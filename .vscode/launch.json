@@ -9,7 +9,7 @@
             "request": "attach",
             "port": 9222,
             "name": "Attach chrome debuggers",
-            "url": "http://localhost:5500/index.html",
+            "url": "http://127.0.0.1:5500/dist/index.html*",
             "webRoot": "${workspaceFolder}"
         }
     ]

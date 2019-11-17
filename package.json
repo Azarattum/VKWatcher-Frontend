@@ -1,16 +1,22 @@
 {
 	"scripts": {
 		"build": "npm run build:css & npm run build:js & npm run build:html",
-		"watch": "npm-run-all --parallel watch:*",
+		"watch": "./node_modules/npm-run-all --parallel watch:*",
 		"clean": "cd ./dist & del /S *.include.* & for /f \"delims=\" %d in ('dir /s /b /ad ^| sort /r') do rd \"%d\" /Q",
-		"build:html": "pug ./src -o ./dist -P --basedir ./",
-		"build:js": "tsc",
-		"build:css": "node-sass --recursive ./src/ --output ./dist/",
-		"watch:html": "pug ./src -o ./dist -P --basedir ./ -w",
-		"watch:js": "tsc -w",
-		"watch:css": "node-sass --watch --recursive ./src/ --output ./dist/"
+		"build:html": "./node_modules/.bin/pug ./src -o ./dist -P --basedir ./",
+		"build:js": "./node_modules/.bin/tsc",
+		"build:css": "./node_modules/.bin/node-sass --recursive ./src/ --output ./dist/",
+		"watch:html": "./node_modules/.bin/pug ./src -o ./dist -P --basedir ./ -w",
+		"watch:js": "./node_modules/.bin/tsc -w",
+		"watch:css": "./node_modules/.bin/node-sass --watch --recursive ./src/ --output ./dist/"
 	},
 	"dependencies": {
-		"@types/jquery": "^3.3.31"
+		"@types/jquery": "^3.3.31",
+		"@types/node": "^12.12.8",
+		"node-sass": "^4.13.0",
+		"npm-run-all": "^4.1.5",
+		"pug": "^2.0.4",
+		"pug-cli": "^1.0.0-alpha6",
+		"typescript": "^3.7.2"
 	}
 }
