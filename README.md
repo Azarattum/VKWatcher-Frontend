@@ -3,13 +3,13 @@ Front end web application for processing data from VKWatcher-Backend
 
 ## Features:
   - View all your data in an intuitive table format
-  - Apply filter to the collected data
+  - Apply filters to the collected data
   - Build a graph based on your data
   - Compatible with mobile devices
   - And more...
 
 ### Usage
-Start your web server from ./dist folder.
+Start your web server from *./dist* folder.
 
 ### Installation (DEV): 
 Install all the development dependencies:
