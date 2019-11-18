@@ -17,7 +17,7 @@ Install all the development dependencies:
 npm install --dev
 ```
 
-### NPM Scripts
+### NPM Scripts:
 | Script			| Description                                                   |
 | ----------------- | ------------------------------------------------------------- |
 | **build**			| Builds the entire project
