@@ -8,7 +8,7 @@ Front end web application for processing data from VKWatcher-Backend
   - Compatible with mobile devices
   - And more...
 
-### Usage
+### Usage:
 Start your web server from *./dist* folder.
 
 ### Installation (DEV): 
