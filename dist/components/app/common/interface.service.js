@@ -4,24 +4,22 @@ export default class Interface {
     static initialize(users) {
         this.emptyButton = document.getElementById("empty");
         this.deviceSelector = document.getElementById("device");
-        const sender = this;
         //Users list
         const usersContainer = document.getElementById("users");
         if (usersContainer) {
             for (const i in users) {
                 const user = users[i];
-                usersContainer.innerHTML +=
-                    `<div class="button user" onclick="changeUser(${i})">${user}</div>`;
+                usersContainer.innerHTML += `<div class="button user" onclick="changeUser(${i})">${user}</div>`;
             }
         }
         //Period selector
         this.periodSlider = new Slider(document.getElementById("period-slider"), {
             type: "double",
-            drag_interval: true,
+            dragInterval: true,
             grid: true,
             prettify: (value) => {
                 let date = DateUtils.getDateFromGlobalDay(value).toString();
-                date = date.split(' ')[1] + " " + date.split(' ')[2];
+                date = date.split(" ")[1] + " " + date.split(" ")[2];
                 return date;
             }
         });
@@ -31,8 +29,8 @@ export default class Interface {
             max: 16,
             step: 0.25,
             from: 1,
-            onFinish: function (state) {
-                sender.call("zoomed", state.from);
+            onFinish: (state) => {
+                this.call("zoomed", state.from);
             }
         });
         //Interface functions
@@ -47,13 +45,12 @@ export default class Interface {
         };
         window.openProfile = (event) => {
             const id = event.target.textContent;
-            const newWindow = window.open("https://vk.com/id" + id, '_blank');
+            const newWindow = window.open("https://vk.com/id" + id, "_blank");
             if (newWindow)
                 newWindow.focus();
         };
     }
     static refresh(days, { from, to }, platform, empty, zoom = null) {
-        const sender = this;
         //Update controls
         if (zoom) {
             this.zoomSlider.update({
@@ -67,10 +64,10 @@ export default class Interface {
             max: days[days.length - 1],
             from: from,
             to: to,
-            onChange: function (data) {
+            onChange: data => {
                 from = data.from - days[0] + 1;
                 to = data.to - days[0] + 1;
-                sender.call("periodchanged", from, to, days[0]);
+                this.call("periodchanged", from, to, days[0]);
             }
         });
         from = from - days[0] + 1;

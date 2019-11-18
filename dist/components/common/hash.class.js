@@ -38,7 +38,7 @@ export default class Hash {
      */
     static set(property, value) {
         value = value.toString();
-        let hash = window.location.hash;
+        const hash = window.location.hash;
         this.validateString(property);
         this.validateString(value);
         //Add value to hash if it does not exist
@@ -49,7 +49,7 @@ export default class Hash {
             window.location.hash += property + ":" + value;
         }
         //Replace an existing value
-        let regexp = new RegExp(property + ":([^,]*|$)");
+        const regexp = new RegExp(property + ":([^,]*|$)");
         window.location.hash = window.location.hash.replace(regexp, property + ":" + value);
     }
     /**
@@ -58,7 +58,7 @@ export default class Hash {
      */
     static exists(property) {
         const hash = window.location.hash;
-        return (hash.toLowerCase().indexOf(property.toLowerCase() + ":") != -1);
+        return hash.toLowerCase().indexOf(property.toLowerCase() + ":") != -1;
     }
     /**
      * Raises an exception if the strings contains illegal characters

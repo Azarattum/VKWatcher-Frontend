@@ -11,7 +11,7 @@ export default class PeriodFilter extends Filter {
     }
     passDay(day) {
         //Filter the day by period
-        let globalDay = DateUtils.getGlobalDay(day.date);
+        const globalDay = DateUtils.getGlobalDay(day.date);
         return globalDay >= this.from && globalDay <= this.to;
     }
     passSession(session) {

@@ -8,8 +8,6 @@ export default class Drawer {
      * @param {User} user User object
      */
     constructor(canvas, user = null) {
-        this.updateRequested = true;
-        this._styles = { zoom: 1 };
         const ctx = canvas.getContext("2d");
         if (!ctx) {
             throw new Error("Unable to get canvas context!");
@@ -17,6 +15,8 @@ export default class Drawer {
         this.canvas = canvas;
         this.context = ctx;
         this.user = user;
+        this.updateRequested = true;
+        this._styles = { zoom: 1 };
         window.addEventListener("resize", () => {
             this.canvas.width = this.viewport.width;
             this.canvas.height = this.viewport.height;
@@ -70,16 +70,13 @@ export default class Drawer {
             return this._styles;
         }
         const canvasStyle = window.getComputedStyle(this.canvas);
-        if (!this._styles) {
-            this._styles = {};
-        }
         this._styles.column = {
             margin: 4
         };
         this._styles.date = {
             height: 48,
             font: canvasStyle.fontFamily,
-            color: (canvasStyle.color || "black")
+            color: canvasStyle.color || "black"
         };
         this._styles.time = {
             margin: this.viewport.height / this._styles.zoom / 96,
@@ -87,7 +84,7 @@ export default class Drawer {
             fontSize: (this.viewport.height / this._styles.zoom - 48) / 24,
             size: (this.viewport.height - this._styles.date.height) / 24,
             font: canvasStyle.fontFamily,
-            color: (canvasStyle.color || "black")
+            color: canvasStyle.color || "black"
         };
         return this._styles;
     }
@@ -102,7 +99,7 @@ export default class Drawer {
         const color = this.styles.date.color;
         const font = this.styles.date.font;
         const size = Math.min(height / 2.3, (this.viewport.width - left) / (days.length * 3));
-        const hour = ((this.viewport.height - height) / 24);
+        const hour = (this.viewport.height - height) / 24;
         //Presetup canvas
         ctx.font = size + "px " + font;
         ctx.textAlign = "center";
@@ -120,14 +117,13 @@ export default class Drawer {
             ctx.fillText(date, left + width * i + width / 2, this.viewport.height);
             //#endregion
             //#region Columns drawing
-            const x = (width * i) + left + (margin / 2);
+            const x = width * i + left + margin / 2;
             for (const session of day.sessions) {
                 //Caculate coordinates
                 const y = hour * session.from.getHours() +
-                    hour / 60 * session.from.getMinutes() +
+                    (hour / 60) * session.from.getMinutes() +
                     (hour / 60 / 60) * session.from.getSeconds();
-                let length = hour *
-                    ((+session.to - +session.from) / 1000 / 60 / 60);
+                let length = hour * ((+session.to - +session.from) / 1000 / 60 / 60);
                 if (length < 1)
                     length = 1;
                 //Set styles and draw
@@ -157,7 +153,7 @@ export default class Drawer {
             //#endregion
             if (inSleep != null) {
                 ctx.globalAlpha = 0.3;
-                this.shadeRect(ctx, x, inSleep, width - margin, (this.viewport.height - height) - inSleep, 0.15);
+                this.shadeRect(ctx, x, inSleep, width - margin, this.viewport.height - height - inSleep, 0.15);
                 ctx.globalAlpha = 1;
                 inSleep = 0;
             }

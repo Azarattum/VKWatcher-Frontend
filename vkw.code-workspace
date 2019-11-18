@@ -5,6 +5,9 @@
 		}
 	],
 	"settings": {
-		"liveServer.settings.multiRootWorkspaceName": "VKWatcher2"
+		"liveServer.settings.multiRootWorkspaceName": "VKWatcher2",
+		"eslint.validate": [
+			"typescript"
+		]
 	}
 }

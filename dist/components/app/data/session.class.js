@@ -1,15 +1,4 @@
 import DateUtils from "../../common/date.class.js";
-export var Platforms;
-(function (Platforms) {
-    Platforms[Platforms["unknown"] = 0] = "unknown";
-    Platforms[Platforms["mobile"] = 1] = "mobile";
-    Platforms[Platforms["iphone"] = 2] = "iphone";
-    Platforms[Platforms["ipad"] = 3] = "ipad";
-    Platforms[Platforms["android"] = 4] = "android";
-    Platforms[Platforms["wphone"] = 5] = "wphone";
-    Platforms[Platforms["windows"] = 6] = "windows";
-    Platforms[Platforms["web"] = 7] = "web";
-})(Platforms || (Platforms = {}));
 /**
  * Class represents single user's session
  */
@@ -47,23 +36,27 @@ export default class Session {
      * @param {Boolen} dailyPrecision Check only date, but not time
      */
     isCovered(date, dailyPrecision = true) {
-        let from = dailyPrecision ? +DateUtils.normalizeDateUp(this.from) : +this.from;
-        let to = dailyPrecision ? +DateUtils.normalizeDateDown(this.to) : +this.to;
+        const from = dailyPrecision
+            ? +DateUtils.normalizeDateUp(this.from)
+            : +this.from;
+        const to = dailyPrecision
+            ? +DateUtils.normalizeDateDown(this.to)
+            : +this.to;
         return +date >= from && +date <= to;
     }
     /**
      * Checks whether the session covers 00:00
      */
     isOverNight() {
-        return (this.from.getDate() !== this.to.getDate()) ||
-            (this.from.getMonth() !== this.to.getMonth()) ||
-            (this.from.getFullYear() !== this.to.getFullYear());
+        return (this.from.getDate() !== this.to.getDate() ||
+            this.from.getMonth() !== this.to.getMonth() ||
+            this.from.getFullYear() !== this.to.getFullYear());
     }
     /**
      * Split the session into an array, so they do not cover 00:00
      */
     splitOverNights() {
-        let sessions = [];
+        const sessions = [];
         if (!this.isOverNight())
             return [this];
         //Create the first day session
@@ -71,7 +64,7 @@ export default class Session {
         let to = new Date(+this.from);
         to = DateUtils.normalizeDateDown(to);
         sessions.push(new Session(from, to, this.platform));
-        let fullDays = DateUtils.getDaysBetween(this.from, this.to) - 1;
+        const fullDays = DateUtils.getDaysBetween(this.from, this.to) - 1;
         for (let i = 0; i < fullDays; i++) {
             //Add a day
             from.setDate(from.getDate() + 1);
@@ -92,4 +85,18 @@ export default class Session {
         return sessions;
     }
 }
+/**
+ * All known platform ids
+ */
+export var Platforms;
+(function (Platforms) {
+    Platforms[Platforms["unknown"] = 0] = "unknown";
+    Platforms[Platforms["mobile"] = 1] = "mobile";
+    Platforms[Platforms["iphone"] = 2] = "iphone";
+    Platforms[Platforms["ipad"] = 3] = "ipad";
+    Platforms[Platforms["android"] = 4] = "android";
+    Platforms[Platforms["wphone"] = 5] = "wphone";
+    Platforms[Platforms["windows"] = 6] = "windows";
+    Platforms[Platforms["web"] = 7] = "web";
+})(Platforms || (Platforms = {}));
 //# sourceMappingURL=session.class.js.map

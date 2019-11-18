@@ -4,14 +4,18 @@ import PeriodFilter from "../data/filters/period.class.js";
 import User from "../data/user.class.js";
 import Session from "../data/session.class.js";
 export default class Users {
-    static get selectedId() { return this._selectedId; }
-    static get selected() { return this.data[this._selectedId]; }
+    static get selectedId() {
+        return this._selectedId;
+    }
+    static get selected() {
+        return this.data[this._selectedId];
+    }
     static initialize(data) {
         //Iterate through all users in data
         for (const id in data) {
             const userData = data[id];
             //Create user object
-            let user = new User(userData.name, +id);
+            const user = new User(userData.name, +id);
             //Add sessions
             for (const session of userData.sessions) {
                 if (session.from !== undefined) {
@@ -19,9 +23,9 @@ export default class Users {
                 }
             }
             //Add filters
-            let empty = new EmptyFilter("empty");
-            let device = new DeviceFilter("device");
-            let period = new PeriodFilter("period");
+            const empty = new EmptyFilter("empty");
+            const device = new DeviceFilter("device");
+            const period = new PeriodFilter("period");
             //Setup filters
             const days = Object.keys(user.days);
             empty.toggle(false);

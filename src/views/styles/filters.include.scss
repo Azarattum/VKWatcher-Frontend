@@ -38,7 +38,7 @@
 			}
 
 			&:checked ~ .empty-checkmark:after {
-				display: block;
+				opacity: 1;
 			}
 		}
 
@@ -55,7 +55,6 @@
 			&:after {
 				content: "";
 				position: absolute;
-				display: none;
 				left: 9px;
 				top: 5px;
 				width: 5px;
@@ -64,6 +63,8 @@
 				border: solid white;
 				border-width: 0 3px 3px 0;
 				transform: rotate(45deg);
+				opacity: 0;
+				transition: 0.2s;
 			}
 		}
 

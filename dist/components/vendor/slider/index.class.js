@@ -2,12 +2,11 @@ export default class Slider {
     constructor(container, settings) {
         if (!container)
             throw new Error("Invalid container element!");
-        this.container = container;
-        this.element =
-            $($(container).ionRangeSlider(settings))
-                .data("ionRangeSlider");
+        settings["drag_interval"] = settings.dragInterval;
+        this.element = $($(container).ionRangeSlider(settings)).data("ionRangeSlider");
     }
     update(settings) {
+        settings["drag_interval"] = settings.dragInterval;
         this.element.update(settings);
     }
 }

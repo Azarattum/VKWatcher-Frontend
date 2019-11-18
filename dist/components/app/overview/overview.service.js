@@ -4,7 +4,7 @@ export default class Overview {
     static initialize() {
         this.drawer = new Drawer(document.getElementById("overview-render"), this.user);
         const styles = window.getComputedStyle(document.getElementsByClassName("page")[0]);
-        let colors = [];
+        const colors = [];
         for (const platform in Platforms) {
             colors[platform] = styles.getPropertyValue("--color-" + Platforms[platform]);
         }
@@ -18,7 +18,6 @@ export default class Overview {
             this.user = user;
             return;
         }
-        ;
         this.drawer.user = user;
         this.drawer.render();
         console.log(this.drawer);
@@ -28,7 +27,6 @@ export default class Overview {
             this.zoom = factor;
             return;
         }
-        ;
         this.drawer.zoom = factor;
     }
     static addEventListener(type, callback) {

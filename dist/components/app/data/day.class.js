@@ -57,9 +57,9 @@ export default class Day {
         if (!filter.enabled)
             return new Day(new Date(+this.date), this.sessions.slice(0));
         //Create a new day on the same date
-        let day = new Day(this.date);
+        const day = new Day(this.date);
         //Filter the sessions
-        let sessions = this.sessions.filter(x => {
+        const sessions = this.sessions.filter(x => {
             return filter.passSession(x);
         });
         //Add filtered session to a new day
@@ -71,7 +71,7 @@ export default class Day {
      * @param {Filter} filter Filter to apply
      */
     applyFilter(filter) {
-        let day = new Day(new Date(+this.date), this.sessions.slice(0));
+        const day = new Day(new Date(+this.date), this.sessions.slice(0));
         //If filter is disable then filter nothing
         if (!filter.enabled)
             return day;

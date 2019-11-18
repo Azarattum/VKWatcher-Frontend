@@ -6,7 +6,7 @@ export default class Hash {
 	 * Initializes URL Hash object
 	 * @param {Object} defaults Default values for hash
 	 */
-	static initialize(defaults: { [property: string]: any }): void {
+	public static initialize(defaults: { [property: string]: any }): void {
 		for (const key in defaults) {
 			if (this.exists(key)) {
 				continue;
@@ -20,7 +20,7 @@ export default class Hash {
 	 * Returns the value of hash property
 	 * @param {String} property Name of property
 	 */
-	static get(property: string): string | null {
+	public static get(property: string): string | null {
 		this.validateString(property);
 		const properties = window.location.hash.slice(1).split(",");
 		for (const prop of properties) {
@@ -38,9 +38,9 @@ export default class Hash {
 	 * Sets the value of hash property
 	 * @param {String} propertyName Name of a property
 	 */
-	static set(property: string, value: any): void {
+	public static set(property: string, value: any): void {
 		value = value.toString();
-		let hash = window.location.hash;
+		const hash = window.location.hash;
 		this.validateString(property);
 		this.validateString(value);
 		//Add value to hash if it does not exist
@@ -52,7 +52,7 @@ export default class Hash {
 		}
 
 		//Replace an existing value
-		let regexp = new RegExp(property + ":([^,]*|$)");
+		const regexp = new RegExp(property + ":([^,]*|$)");
 		window.location.hash = window.location.hash.replace(
 			regexp,
 			property + ":" + value
@@ -63,11 +63,9 @@ export default class Hash {
 	 * Checks whethe the property exists or not
 	 * @param {String} property Property name
 	 */
-	static exists(property: string): boolean {
+	public static exists(property: string): boolean {
 		const hash = window.location.hash;
-		return (
-			hash.toLowerCase().indexOf(property.toLowerCase() + ":") != -1
-		);
+		return hash.toLowerCase().indexOf(property.toLowerCase() + ":") != -1;
 	}
 
 	/**

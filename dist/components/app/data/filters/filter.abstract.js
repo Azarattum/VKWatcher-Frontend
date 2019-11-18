@@ -3,8 +3,8 @@
  */
 export default class Filter {
     constructor(id) {
-        this.id = id;
         this.enabled = true;
+        this.id = id;
     }
     /**
      * Toggle the state of the filter.

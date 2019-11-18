@@ -22,10 +22,10 @@ export default class User {
      * @param {Boolean} applyFilters Should filters be applied
      */
     getDays(applyFilters = true) {
-        let days = [];
-        let day = undefined;
-        let getDay = this.getDaysEnumenator();
-        while ((day = getDay()) != undefined) {
+        const days = [];
+        const getDay = this.getDaysEnumenator(applyFilters);
+        let day = null;
+        while ((day = getDay()) != null) {
             days.push(day);
         }
         return days;
@@ -35,29 +35,28 @@ export default class User {
      * @param {Boolean} applyFilters Should filters be applied
      */
     getDaysEnumenator(applyFilters = true) {
-        let days = Object.keys(this.days);
-        var maxDay = +days[days.length - 1];
-        var currentDay = +days[0];
-        var user = this;
-        return function () {
+        const days = Object.keys(this.days);
+        const maxDay = +days[days.length - 1];
+        let currentDay = +days[0];
+        return () => {
             if (currentDay > maxDay) {
-                return undefined;
+                return null;
             }
             else {
                 //Find the next day using filters
                 let day = null;
                 while (day == null) {
-                    day = user.days[currentDay];
+                    day = this.days[currentDay];
                     if (day === undefined)
                         return day;
                     currentDay++;
                     if (applyFilters) {
                         //Filter sessions
-                        for (const filter of user.filters) {
+                        for (const filter of this.filters) {
                             day = day.applySessionsFilter(filter);
                         }
                         //Filter day
-                        for (const filter of user.filters) {
+                        for (const filter of this.filters) {
                             if (day === null)
                                 break;
                             day = day.applyFilter(filter);
@@ -82,18 +81,18 @@ export default class User {
             return;
         }
         //Get global day to use as a key
-        let day = DateUtils.getGlobalDay(session.from);
+        const day = DateUtils.getGlobalDay(session.from);
         //Create a day if it does not exist
         if (this.days[day] === undefined) {
             //Fill up empty days in between
-            let days = Object.keys(this.days);
+            const days = Object.keys(this.days);
             if (days.length > 0) {
-                let minDay = +days[0];
-                let maxDay = +days[days.length - 1];
-                for (let i = (day + 1); i < minDay; i++) {
+                const minDay = +days[0];
+                const maxDay = +days[days.length - 1];
+                for (let i = day + 1; i < minDay; i++) {
                     this.days[i] = new Day(DateUtils.getDateFromGlobalDay(i));
                 }
-                for (let i = (day - 1); i > maxDay; i--) {
+                for (let i = day - 1; i > maxDay; i--) {
                     this.days[i] = new Day(DateUtils.getDateFromGlobalDay(i));
                 }
             }

@@ -186,9 +186,6 @@ import Overview from "./components/app/overview/overview.service.js";
 import Hash from "./components/common/hash.class.js";
 import Interface from "./components/app/common/interface.service.js";
 import Utils, { LogType } from "./components/common/utils.class.js";
-window.addEventListener("load", async () => {
-    await initialize();
-});
 async function initialize() {
     Utils.log("Initializtion started...");
     let exceptions = 0;
@@ -259,8 +256,7 @@ async function initializeHash() {
     const defaults = {
         user: 0,
         zoom: 1,
-        period: "1-" +
-            Object.values(Users.selected.days).length,
+        period: "1-" + Object.values(Users.selected.days).length,
         device: -1,
         empty: true,
         tab: "overview"
@@ -269,8 +265,8 @@ async function initializeHash() {
     //Load hash values
     const days = Object.keys(Users.selected.days).map(x => +x);
     const period = {
-        from: +(Hash.get("period") || "1-1").split('-')[0] + days[0] - 1,
-        to: +(Hash.get("period") || "1-1").split('-')[1] + days[0] - 1
+        from: +(Hash.get("period") || "1-1").split("-")[0] + days[0] - 1,
+        to: +(Hash.get("period") || "1-1").split("-")[1] + days[0] - 1
     };
     const device = +(Hash.get("device") || -1);
     const empty = Hash.get("empty") == "true";
@@ -294,8 +290,7 @@ async function initializeInterface() {
     Interface.addEventListener("zoomed", (factor) => {
         Hash.set("zoom", factor);
         Overview.setZoom(factor);
-        document.getElementsByClassName("page")[0]
-            .style.setProperty("--vertical-zoom", factor.toString());
+        document.getElementsByClassName("page")[0].style.setProperty("--vertical-zoom", factor.toString());
     });
     Interface.addEventListener("devicechanged", (id) => {
         Hash.set("device", id);
@@ -313,6 +308,9 @@ async function initializeInterface() {
 async function initializeOverview() {
     Overview.initialize();
 }
+window.addEventListener("load", async () => {
+    await initialize();
+});
 //# sourceMappingURL=index.include.js.map
     </script>
     <meta charset="UTF-8"/>
@@ -359,7 +357,7 @@ async function initializeOverview() {
       .filters .empty-container input:checked ~ .empty-checkmark {
         background-color: var(--color-text); }
       .filters .empty-container input:checked ~ .empty-checkmark:after {
-        display: block; }
+        opacity: 1; }
     .filters .empty-container .empty-checkmark {
       position: absolute;
       top: 0;
@@ -371,14 +369,15 @@ async function initializeOverview() {
       .filters .empty-container .empty-checkmark:after {
         content: "";
         position: absolute;
-        display: none;
         left: 9px;
         top: 5px;
         width: 5px;
         height: 10px;
         border: solid white;
         border-width: 0 3px 3px 0;
-        transform: rotate(45deg); }
+        transform: rotate(45deg);
+        opacity: 0;
+        transition: 0.2s; }
     .filters .empty-container:hover input ~ .empty-checkmark {
       background-color: #ccc; }
   .filters .device {

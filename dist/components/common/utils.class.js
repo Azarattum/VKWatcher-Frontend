@@ -3,24 +3,32 @@
  */
 export default class Utils {
     static log(text, type = LogType.INFO) {
-        const date = new Date().toTimeString().split(' ')[0];
+        const date = new Date().toTimeString().split(" ")[0];
         const prefix = `[${date}]: `;
         switch (type) {
-            case LogType.INFO:
+            case LogType.INFO: {
                 console.log(prefix + "%ci " + text, "font-weight:bold;");
                 break;
-            case LogType.OK:
+            }
+            case LogType.OK: {
                 console.log(prefix + "%c\u2714 " + text, "color:green;font-weight:bold;");
                 break;
-            case LogType.ERROR:
+            }
+            case LogType.ERROR: {
                 console.error(prefix + "%c\u2718 " + text, "color:red;font-weight:bold;");
                 break;
-            case LogType.WARNING:
+            }
+            case LogType.WARNING: {
                 console.log(prefix + "%c! " + text, "color:goldenrod;font-weight:bold;");
                 break;
-            case LogType.DIVIDER:
-                const divider = '='.repeat(30 - text.length / 2);
+            }
+            case LogType.DIVIDER: {
+                const divider = "=".repeat(30 - text.length / 2);
                 console.log(divider + text + divider);
+                break;
+            }
+            default:
+                throw new TypeError("Unknown log type!");
         }
     }
 }

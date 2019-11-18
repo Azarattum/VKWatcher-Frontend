@@ -6,7 +6,7 @@ export default class Loader {
         this.urls = urls;
     }
     async load() {
-        let responses = [];
+        const responses = [];
         for (const url of this.urls) {
             const response = await this.request("GET", url);
             responses.push(response);
@@ -15,7 +15,7 @@ export default class Loader {
     }
     async request(method, url) {
         return new Promise(function (resolve, reject) {
-            let xhr = new XMLHttpRequest();
+            const xhr = new XMLHttpRequest();
             //Assume json request
             if (url.replace(new RegExp("/$"), "").endsWith(".json")) {
                 xhr.overrideMimeType("application/json");

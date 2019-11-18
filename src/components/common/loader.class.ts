@@ -4,23 +4,23 @@
 export default class Loader {
 	public urls: string[];
 
-	constructor(urls: Array<string>) {
+	public constructor(urls: Array<string>) {
 		this.urls = urls;
 	}
 
 	public async load(): Promise<Array<any>> {
-		let responses: Array<any> = [];
+		const responses: Array<any> = [];
 		for (const url of this.urls) {
 			const response = await this.request("GET", url);
-			responses.push(response)
+			responses.push(response);
 		}
 
 		return [...responses];
 	}
 
 	private async request(method: string, url: string): Promise<any> {
-		return new Promise(function (resolve, reject) {
-			let xhr = new XMLHttpRequest();
+		return new Promise(function(resolve, reject) {
+			const xhr = new XMLHttpRequest();
 			//Assume json request
 			if (url.replace(new RegExp("/$"), "").endsWith(".json")) {
 				xhr.overrideMimeType("application/json");
@@ -28,7 +28,7 @@ export default class Loader {
 			}
 
 			xhr.open(method, url);
-			xhr.onload = function () {
+			xhr.onload = function(): void {
 				if (this.status >= 200 && this.status < 300) {
 					resolve(xhr.response);
 				} else {
@@ -38,7 +38,7 @@ export default class Loader {
 					});
 				}
 			};
-			xhr.onerror = function () {
+			xhr.onerror = function(): void {
 				reject({
 					status: this.status,
 					statusText: xhr.statusText

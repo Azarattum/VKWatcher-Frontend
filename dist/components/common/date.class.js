@@ -67,7 +67,7 @@ export default class DateUtils {
      * @param {Date} dateTime A date for the time
      */
     static combineDate(dateDate, dateTime) {
-        let date = new Date(+dateDate);
+        const date = new Date(+dateDate);
         date.setHours(dateTime.getHours());
         date.setMinutes(dateTime.getMinutes());
         date.setSeconds(dateTime.getSeconds());

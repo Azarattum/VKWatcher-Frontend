@@ -8,7 +8,10 @@ export default class DateUtils {
 	 * @param {Date} date1 First date
 	 * @param {Date} date2 Second date
 	 */
-	public static getDaysBetween(date1: Date | number, date2: Date | number): number {
+	public static getDaysBetween(
+		date1: Date | number,
+		date2: Date | number
+	): number {
 		//Create new dates
 		date1 = new Date(date1);
 		date2 = new Date(date2);
@@ -72,7 +75,7 @@ export default class DateUtils {
 	 * @param {Date} dateTime A date for the time
 	 */
 	public static combineDate(dateDate: Date, dateTime: Date): Date {
-		let date = new Date(+dateDate);
+		const date = new Date(+dateDate);
 		date.setHours(dateTime.getHours());
 		date.setMinutes(dateTime.getMinutes());
 		date.setSeconds(dateTime.getSeconds());

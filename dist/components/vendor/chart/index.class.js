@@ -49,17 +49,18 @@ export default class Chart {
             func();
             if (!this.chart)
                 return;
-            const values = this.chart.elements.values.children;
+            const values = this.chart.elements
+                .values.children;
             for (const valueElement of values) {
-                let lastChild = valueElement.children[valueElement.children.length - 1];
-                lastChild.innerHTML = DateUtils.getReadableDuration(+(lastChild.innerHTML.replace(/\s*/g, "")));
+                const lastChild = valueElement.children[valueElement.children.length - 1];
+                lastChild.innerHTML = DateUtils.getReadableDuration(+lastChild.innerHTML.replace(/\s*/g, ""));
             }
         };
         if (!this.chart.drawer.layoutDrawer)
             return;
         this.chart.drawer.layoutDrawer._formatValue = (number) => {
             const hours = Math.floor(number / 60 / 60);
-            return hours + "h " + Math.round((number - (hours * 60 * 60)) / 60) + "m";
+            return (hours + "h " + Math.round((number - hours * 60 * 60) / 60) + "m");
         };
         this.update();
     }
@@ -75,8 +76,8 @@ export default class Chart {
         this.chart.update();
         if (this.chart.controller) {
             this.chart.controller.onupdate(0, 0.999999);
-            this.chart.controller.selector
-                .style.width = "calc(100% - 8px)";
+            this.chart.controller.selector.style.width =
+                "calc(100% - 8px)";
         }
     }
     //#endregion
@@ -98,7 +99,7 @@ export default class Chart {
             font: pageStyle.fontFamily,
             lowlight: 0.05
         };
-        this.register_events();
+        this.registerEvents();
     }
     /**
      * Converts user object to chart-library-compatable input object
@@ -108,7 +109,7 @@ export default class Chart {
         //Device colors
         const colors = getComputedStyle(document.getElementsByClassName("page")[0]);
         //Template object
-        let data = {
+        const data = {
             columns: [
                 ["x"],
                 ["y0"],
@@ -121,47 +122,47 @@ export default class Chart {
                 ["y7"]
             ],
             types: {
-                "y0": "bar",
-                "y1": "bar",
-                "y2": "bar",
-                "y3": "bar",
-                "y4": "bar",
-                "y5": "bar",
-                "y6": "bar",
-                "y7": "bar",
-                "x": "x"
+                y0: "bar",
+                y1: "bar",
+                y2: "bar",
+                y3: "bar",
+                y4: "bar",
+                y5: "bar",
+                y6: "bar",
+                y7: "bar",
+                x: "x"
             },
             names: {
-                "y0": "Unknown",
-                "y1": "Mobile",
-                "y2": "iPhone",
-                "y3": "iPad",
-                "y4": "Android",
-                "y5": "WPhone",
-                "y6": "Windows",
-                "y7": "Web"
+                y0: "Unknown",
+                y1: "Mobile",
+                y2: "iPhone",
+                y3: "iPad",
+                y4: "Android",
+                y5: "WPhone",
+                y6: "Windows",
+                y7: "Web"
             },
             colors: {
-                "y0": colors.getPropertyValue("--color-unknown"),
-                "y1": colors.getPropertyValue("--color-mobile"),
-                "y2": colors.getPropertyValue("--color-iphone"),
-                "y3": colors.getPropertyValue("--color-ipad"),
-                "y4": colors.getPropertyValue("--color-android"),
-                "y5": colors.getPropertyValue("--color-wphone"),
-                "y6": colors.getPropertyValue("--color-windows"),
-                "y7": colors.getPropertyValue("--color-web")
+                y0: colors.getPropertyValue("--color-unknown"),
+                y1: colors.getPropertyValue("--color-mobile"),
+                y2: colors.getPropertyValue("--color-iphone"),
+                y3: colors.getPropertyValue("--color-ipad"),
+                y4: colors.getPropertyValue("--color-android"),
+                y5: colors.getPropertyValue("--color-wphone"),
+                y6: colors.getPropertyValue("--color-windows"),
+                y7: colors.getPropertyValue("--color-web")
             },
             stacked: true
         };
         //Scan days
-        let total = [0, 0, 0, 0, 0, 0, 0, 0];
+        const total = [0, 0, 0, 0, 0, 0, 0, 0];
         const days = Object.values(user.days);
         for (let i = 0; i < days.length; i++) {
             const day = days[i];
             data.columns[0][i + 1] = +day.date;
             for (let j = 1; j < 9; j++) {
                 const sum = day.sessions.reduce((a, b) => {
-                    return a + ((b.platform == (j - 1)) ? b.length : 0);
+                    return a + (b.platform == j - 1 ? b.length : 0);
                 }, 0);
                 data.columns[j][i + 1] = sum;
                 total[j - 1] += sum;
@@ -198,14 +199,16 @@ export default class Chart {
     /**
      * Registers all elements events
      */
-    register_events() {
+    registerEvents() {
         //Save old sizes
         let width = null;
         let height = null;
         window.addEventListener("resize", () => {
             //Check if size has changed
             const newSize = this.container.getClientRects()[0];
-            if (!this.chart || !this.chart.chartData || newSize == undefined ||
+            if (!this.chart ||
+                !this.chart.chartData ||
+                newSize == undefined ||
                 (newSize.width == width && newSize.height == height)) {
                 width = newSize ? newSize.width : null;
                 height = newSize ? newSize.height : null;
