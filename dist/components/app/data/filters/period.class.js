@@ -1,5 +1,5 @@
 import Filter from "./filter.abstract.js";
-import DateUtils from "../../../common/utils.class.js";
+import DateUtils from "../../../common/date.class.js";
 /**
  * Filters days by period
  */

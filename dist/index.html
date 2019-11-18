@@ -181,18 +181,81 @@
 
     </style>
     <script type="module">import Loader from "./components/common/loader.class.js";
-import Users from "./components/app/services/users.service.js";
+import Users from "./components/app/common/users.service.js";
+import Overview from "./components/app/overview/overview.service.js";
 import Hash from "./components/common/hash.class.js";
-import Interface from "./components/app/services/interface.service.js";
+import Interface from "./components/app/common/interface.service.js";
+import Utils, { LogType } from "./components/common/utils.class.js";
 window.addEventListener("load", async () => {
+    await initialize();
+});
+async function initialize() {
+    Utils.log("Initializtion started...");
+    let exceptions = 0;
+    ///TODO Make initialization in a loop by generalizing services
+    //Init data
+    try {
+        await initializeData();
+        Utils.log("Data initialized!", LogType.OK);
+    }
+    catch (exception) {
+        Utils.log(`Data initialization exception:\n\t` +
+            `${exception.stack.replace(/\n/g, "\n\t")}`, LogType.ERROR);
+        exceptions++;
+    }
+    //Init interface
+    try {
+        await initializeInterface();
+        Utils.log("Interface initialized!", LogType.OK);
+    }
+    catch (exception) {
+        Utils.log(`Interface initialization exception:\n\t$` +
+            `${exception.stack.replace(/\n/g, "\n\t")}`, LogType.ERROR);
+        exceptions++;
+    }
+    //Init hash
+    try {
+        await initializeHash();
+        Utils.log("Hash initialized!", LogType.OK);
+    }
+    catch (exception) {
+        Utils.log(`Hash initialization exception:\n\t` +
+            `${exception.stack.replace(/\n/g, "\n\t")}`, LogType.ERROR);
+        exceptions++;
+    }
+    //Init overview
+    try {
+        await initializeOverview();
+        Utils.log("Overview initialized!", LogType.OK);
+    }
+    catch (exception) {
+        Utils.log(`Overview initialization exception:\n\t` +
+            `${exception.stack.replace(/\n/g, "\n\t")}`, LogType.ERROR);
+        exceptions++;
+    }
+    //Log result
+    Utils.log("", LogType.DIVIDER);
+    if (exceptions) {
+        Utils.log(`Initialization completed with ${exceptions} exceptions!`, LogType.WARNING);
+    }
+    else {
+        Utils.log("Successfyly initialized!", LogType.OK);
+    }
+}
+async function initializeData() {
     const loader = new Loader(["sessions.json"]);
     const data = await loader.load();
     Users.initialize(data[0]);
     Users.addEventListener("userchanged", () => {
         const days = Object.keys(Users.selected.days).map(x => +x);
         const period = Users.selected.getFilter("period");
-        Interface.refresh(days, period);
+        const device = Users.selected.getFilter("device");
+        const empty = Users.selected.getFilter("empty");
+        Interface.refresh(days, period, device.platform || -1, !empty.enabled);
+        Overview.setUser(Users.selected);
     });
+}
+async function initializeHash() {
     const defaults = {
         user: 0,
         zoom: 1,
@@ -203,6 +266,19 @@ window.addEventListener("load", async () => {
         tab: "overview"
     };
     Hash.initialize(defaults);
+    //Load hash values
+    const days = Object.keys(Users.selected.days).map(x => +x);
+    const period = {
+        from: +(Hash.get("period") || "1-1").split('-')[0] + days[0] - 1,
+        to: +(Hash.get("period") || "1-1").split('-')[1] + days[0] - 1
+    };
+    const device = +(Hash.get("device") || -1);
+    const empty = Hash.get("empty") == "true";
+    const zoom = +(Hash.get("zoom") || 1);
+    Users.select(+(Hash.get("user") || 0));
+    Interface.refresh(days, period, device, empty, zoom);
+}
+async function initializeInterface() {
     Interface.initialize(Users.data.map(x => x.name));
     Interface.addEventListener("userchanged", (id, relative) => {
         Users.select(id, relative);
@@ -210,18 +286,33 @@ window.addEventListener("load", async () => {
     });
     Interface.addEventListener("periodchanged", (from, to, offset) => {
         Hash.set("period", from + "-" + to);
+        //Update filter
+        const filter = Users.selected.getFilter("period");
+        filter.from = from + offset - 1;
+        filter.to = to + offset - 1;
     });
     Interface.addEventListener("zoomed", (factor) => {
         Hash.set("zoom", factor);
+        Overview.setZoom(factor);
+        document.getElementsByClassName("page")[0]
+            .style.setProperty("--vertical-zoom", factor.toString());
     });
     Interface.addEventListener("devicechanged", (id) => {
         Hash.set("device", id);
+        //Update filter
+        const filter = Users.selected.getFilter("device");
+        filter.platform = id;
     });
     Interface.addEventListener("emptychanged", (value) => {
         Hash.set("empty", value);
+        //Update filter
+        const filter = Users.selected.getFilter("empty");
+        filter.toggle(!value);
     });
-    Users.call("userchanged");
-});
+}
+async function initializeOverview() {
+    Overview.initialize();
+}
 //# sourceMappingURL=index.include.js.map
     </script>
     <meta charset="UTF-8"/>
@@ -316,18 +407,18 @@ window.addEventListener("load", async () => {
               </style><span class="label">Filters:</span>
               <div class="filters">
                 <label class="empty-container">Empty
-                  <input type="checkbox" checked="true" onclick="changeEmpty(event)"/><span class="empty-checkmark"></span>
+                  <input type="checkbox" checked="true" onclick="changeEmpty(event)" id="empty"/><span class="empty-checkmark"></span>
                 </label>
-                <select class="device" onchange="changeDevice(+this.value)">
+                <select class="device" onchange="changeDevice(+this.value)" id="device">
                   <option class="none" value="-1">No Device Filter</option>
-                  <option value="0">Unknown</option>
-                  <option value="1">Mobile</option>
-                  <option value="2">iPhone</option>
-                  <option value="3">iPad</option>
-                  <option value="4">Android</option>
-                  <option value="5">WPhone</option>
-                  <option value="6">Windows</option>
-                  <option value="7">Web</option>
+                  <option value="0" style="background-color:var(--color-unknown)">Unknown</option>
+                  <option value="1" style="background-color:var(--color-mobile)">Mobile</option>
+                  <option value="2" style="background-color:var(--color-iphone)">iPhone</option>
+                  <option value="3" style="background-color:var(--color-ipad)">iPad</option>
+                  <option value="4" style="background-color:var(--color-android)">Android</option>
+                  <option value="5" style="background-color:var(--color-wphone)">WPhone</option>
+                  <option value="6" style="background-color:var(--color-windows)">Windows</option>
+                  <option value="7" style="background-color:var(--color-web)">Web</option>
                 </select><span class="label">Period:</span>
                 <div class="period">
                   <input type="text" id="period-slider"/>

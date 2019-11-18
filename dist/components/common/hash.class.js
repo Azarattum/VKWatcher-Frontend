@@ -22,12 +22,12 @@ export default class Hash {
     static get(property) {
         this.validateString(property);
         const properties = window.location.hash.slice(1).split(",");
-        for (const property of properties) {
-            const key = property.split(":")[0];
+        for (const prop of properties) {
+            const key = prop.split(":")[0];
             //Find property with given name
             if (key.toLocaleLowerCase() == property.toLocaleLowerCase()) {
                 //Return the value
-                return property.split(":")[1];
+                return prop.split(":")[1];
             }
         }
         return null;

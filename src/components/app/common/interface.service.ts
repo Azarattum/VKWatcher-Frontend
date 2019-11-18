@@ -1,14 +1,20 @@
 import Slider from "../../vendor/slider/index.class.js";
-import DateUtils from "../../common/utils.class.js";
+import DateUtils from "../../common/date.class.js";
 
 export default class Interface {
     private static callbacks: { [type: string]: Function[]; } = {};
 
     private static periodSlider: Slider;
     private static zoomSlider: Slider;
+    private static emptyButton: HTMLInputElement;
+    private static deviceSelector: HTMLSelectElement;
 
     public static initialize(users: string[]): void {
+        this.emptyButton = document.getElementById("empty") as HTMLInputElement;
+        this.deviceSelector = document.getElementById("device") as HTMLSelectElement;
+
         const sender = this;
+        //Users list
         const usersContainer = document.getElementById("users");
         if (usersContainer) {
             for (const i in users) {
@@ -43,8 +49,6 @@ export default class Interface {
                 from: 1,
                 onFinish: function (state) {
                     sender.call("zoomed", state.from);
-                    (document.getElementsByClassName("page")[0] as HTMLElement)
-                        .style.setProperty("--vertical-zoom", state.from.toString());
                 }
             }
         );
@@ -69,8 +73,17 @@ export default class Interface {
         }
     }
 
-    public static refresh(days: number[], { from, to }: { from: number, to: number }): void {
+    public static refresh(days: number[], { from, to }: { from: number, to: number }, platform: number, empty: boolean, zoom: number | null = null): void {
         const sender = this;
+        //Update controls
+        if (zoom) {
+            this.zoomSlider.update({
+                from: zoom
+            });
+        }
+
+        this.emptyButton.checked = empty;
+        this.deviceSelector.value = platform.toString();
         this.periodSlider.update({
             min: days[0],
             max: days[days.length - 1],
@@ -85,7 +98,14 @@ export default class Interface {
 
         from = from - days[0] + 1;
         to = to - days[0] + 1;
+
+        //Call filter updates
         this.call("periodchanged", from, to, days[0]);
+        this.call("devicechanged", platform);
+        this.call("emptychanged", empty);
+        if (zoom) {
+            this.call("zoomed", zoom);
+        }
     }
 
     public static addEventListener(type: "zoomed" | "userchanged" | "periodchanged" | "emptychanged" | "devicechanged", callback: Function): void {

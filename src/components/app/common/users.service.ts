@@ -54,7 +54,7 @@ export default class Users {
     public static select(id: number, relative: boolean = false): void {
         if (relative) id += this._selectedId;
 
-        if (this.data[id] && this._selectedId != id) {
+        if (this.data[id]) {
             this._selectedId = id;
             this.call("userchanged");
         }

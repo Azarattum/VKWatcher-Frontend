@@ -1,4 +1,4 @@
-import DateUtils from "../../common/utils.class.js";
+import DateUtils from "../../common/date.class.js";
 
 export enum Platforms {
     unknown, mobile, iphone, ipad, android, wphone, windows, web

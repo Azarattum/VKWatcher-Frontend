@@ -1,5 +1,5 @@
 import ChartElement from "./scripts/element/element.js";
-import DateUtils from "../../common/utils.class.js";
+import DateUtils from "../../common/date.class.js";
 import Loader from "../../common/loader.class.js";
 import User from "../../app/data/user.class.js";
 

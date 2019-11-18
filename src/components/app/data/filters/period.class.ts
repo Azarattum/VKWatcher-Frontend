@@ -1,6 +1,6 @@
 import Filter from "./filter.abstract.js";
 import IFilter from "./filter.interface.js";
-import DateUtils from "../../../common/utils.class.js";
+import DateUtils from "../../../common/date.class.js";
 import Day from "../day.class.js";
 import Session from "../session.class.js";
 

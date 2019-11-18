@@ -1,100 +1,39 @@
 /**
- * Utilities to work with dates
+ * Some useful utilities
  */
-export default class DateUtils {
-	/**
-	 * Counts days between two dates.
-	 * For expample it return 1 for Jan 4 & Jan 5, 0 for Jan 4 & Jan 4.
-	 * @param {Date} date1 First date
-	 * @param {Date} date2 Second date
-	 */
-	static getDaysBetween(date1: Date | number, date2: Date | number): number {
-		//Create new dates
-		date1 = new Date(date1);
-		date2 = new Date(date2);
-		//Normalize values
-		date1 = this.normalizeDateUp(date1);
-		date2 = this.normalizeDateUp(date2);
-		//Count difference
-		const dateDifference = Math.abs(+date1 - +date2);
-		//Count days
-		const oneDay = 24 * 60 * 60 * 1000;
-		return Math.round(dateDifference / oneDay);
-	}
+export default class Utils {
+    public static log(text: string, type: LogType = LogType.INFO) {
+        const date = new Date().toTimeString().split(' ')[0];
+        const prefix = `[${date}]: `;
 
-	/**
-	 * Sests the time to 0:0:0 (start of the day)
-	 * @param {Date} date Input date
-	 */
-	static normalizeDateUp(date: Date | number): Date {
-		date = new Date(+date);
-		date.setHours(0);
-		date.setMinutes(0);
-		date.setSeconds(0);
-		date.setMilliseconds(0);
-		return date;
-	}
+        switch (type) {
+            case LogType.INFO:
+                console.log(prefix + "%ci " + text,
+                    "font-weight:bold;");
+                break;
 
-	/**
-	 * Sests the time to 23:59:59 (end of the day)
-	 * @param {Date} date Input date
-	 */
-	static normalizeDateDown(date: Date | number): Date {
-		date = new Date(+date);
-		date.setHours(23);
-		date.setMinutes(59);
-		date.setSeconds(59);
-		date.setMilliseconds(499);
-		return date;
-	}
+            case LogType.OK:
+                console.log(prefix + "%c\u2714 " + text,
+                    "color:green;font-weight:bold;");
+                break;
 
-	/**
-	 * Returns the day from the begging of time (Jan 01 1970)
-	 * @param {Date} date Input date
-	 */
-	static getGlobalDay(date: Date | number): number {
-		return this.getDaysBetween(new Date(0), +date);
-	}
+            case LogType.ERROR:
+                console.error(prefix + "%c\u2718 " + text,
+                    "color:red;font-weight:bold;");
+                break;
 
-	/**
-	 * Converts global day back to date object.
-	 * The time will be 00:00:00
-	 * @param {Number} day Global day
-	 */
-	static getDateFromGlobalDay(day: number): Date {
-		const oneDay = 24 * 60 * 60 * 1000;
-		return this.normalizeDateUp(new Date(oneDay * day));
-	}
+            case LogType.WARNING:
+                console.log(prefix + "%c! " + text,
+                    "color:goldenrod;font-weight:bold;");
+                break;
 
-	/**
-	 * Combines the date from one date and the time from another
-	 * @param {Date} dateDate A date for the date
-	 * @param {Date} dateTime A date for the time
-	 */
-	static combineDate(dateDate: Date, dateTime: Date): Date {
-		let date = new Date(+dateDate);
-		date.setHours(dateTime.getHours());
-		date.setMinutes(dateTime.getMinutes());
-		date.setSeconds(dateTime.getSeconds());
-		date.setMilliseconds(dateTime.getMilliseconds());
-		return date;
-	}
+            case LogType.DIVIDER:
+                const divider = '='.repeat(30 - text.length / 2);
+                console.log(divider + text + divider);
+        }
+    }
+}
 
-	/**
-	 * Formats duration to human readable text
-	 * @param {Number} duration Duration in seconds
-	 */
-	static getReadableDuration(duration: number): string {
-		const hours = Math.floor(duration / 60 / 60);
-		const minutes = Math.floor((duration - 60 * 60 * hours) / 60);
-		const seconds = Math.floor(duration - 60 * 60 * hours - 60 * minutes);
-
-		const format =
-			(hours > 0 ? hours + " h, " : "") +
-			(minutes > 0 ? minutes + " min, " : "") +
-			seconds +
-			" sec";
-
-		return format;
-	}
+export enum LogType {
+    INFO, OK, WARNING, ERROR, DIVIDER
 }

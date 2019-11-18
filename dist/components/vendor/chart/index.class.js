@@ -1,5 +1,5 @@
 import ChartElement from "./scripts/element/element.js";
-import DateUtils from "../../common/utils.class.js";
+import DateUtils from "../../common/date.class.js";
 import Loader from "../../common/loader.class.js";
 export default class Chart {
     constructor(container) {
