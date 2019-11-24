@@ -18,18 +18,12 @@ npm install --dev
 ```
 
 ### NPM Scripts:
-| Script     | Description                                                  |
-| ---------- | ------------------------------------------------------------ |
-| **build**  | Builds the entire project                                    |
-| **watch**  | Watches all files and rebuilds them if necessary             |
-| **clean**  | Cleans up unnecessary files and empty folders from the built |
-| clean:win  | Windows ipmlementation of the script above                   |
-| build:html | Builds all .pug files into .html                             |
-| build:js   | Builds all .ts files into .js                                |
-| build:css  | Builds all .scss files into .css                             |
-| watch:html | Watches changes in .pug files and rebuilds them              |
-| watch:js   | Watches changes in .ts files and rebuilds them               |
-| watch:css  | Watches changes in .scss files and rebuilds them             |
+| Script    | Description                                             |
+| --------- | ------------------------------------------------------- |
+| **serve** | Starts the webpack development server                   |
+| build     | Builds the entire project with webpack                  |
+| watch     | Watches all file changes and rebuilds them if necessary |
+| release   | Creates a production build of the project               |
 
 ### TODO:
   - devicePixelRatio in overview.worker
