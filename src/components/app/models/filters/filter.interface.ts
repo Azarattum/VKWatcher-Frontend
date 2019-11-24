@@ -9,6 +9,8 @@ export default interface IFilter {
 	id: string | number;
 	/**Is filter using or disabled */
 	enabled: boolean;
+	/**The type of filter */
+	type: string;
 
 	/**
 	 * Checks whether or not a day satisfies the filter

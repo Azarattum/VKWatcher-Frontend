@@ -17,10 +17,6 @@ module.exports = {
 				exclude: /node_modules/
 			},
 			{
-				test: /\.worker\.ts$/,
-				use: { loader: "worker-loader" }
-			},
-			{
 				test: /\.pug$/,
 				use: ["pug-loader"]
 			},

@@ -1,15 +1,12 @@
 /**
  * View renderer
  */
-((): void => {
-	const viewName = "overview";
-	require(`./${viewName}.scss`);
-	const template = require(`./${viewName}.pug`);
+import "./overview.scss";
+import Template from "./overview.pug";
 
-	window.addEventListener("load", () => {
-		const container = document.querySelector(`[view=${viewName}]`);
-		if (container) {
-			container.innerHTML = template();
-		}
-	});
-})();
+window.addEventListener("load", () => {
+	const container = document.querySelector("[view=overview]");
+	if (container) {
+		container.innerHTML = Template();
+	}
+});

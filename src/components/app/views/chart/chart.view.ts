@@ -1,15 +1,12 @@
 /**
  * View renderer
  */
-((): void => {
-	const viewName = "chart";
-	require(`./${viewName}.scss`);
-	const template = require(`./${viewName}.pug`);
+import "./chart.scss";
+import Template from "./chart.pug";
 
-	window.addEventListener("load", () => {
-		const container = document.querySelector(`[view=${viewName}]`);
-		if (container) {
-			container.innerHTML = template();
-		}
-	});
-})();
+window.addEventListener("load", () => {
+	const container = document.querySelector("[view=chart]");
+	if (container) {
+		container.innerHTML = Template();
+	}
+});

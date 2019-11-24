@@ -8,6 +8,7 @@ import Session from "../session.class";
  * Filters days by period
  */
 export default class PeriodFilter extends Filter implements IFilter {
+	public type: string = "period";
 	public from: number;
 	public to: number;
 

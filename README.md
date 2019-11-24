@@ -26,4 +26,4 @@ npm install --dev
 | release   | Creates a production build of the project               |
 
 ### TODO:
-  - devicePixelRatio in overview.worker
+  - Add proxy to filter updates in users service

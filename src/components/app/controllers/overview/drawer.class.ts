@@ -34,11 +34,6 @@ export default class Drawer {
 		this.stylesCache = {} as CSSStyleDeclaration;
 		this.styles = { zoom: 1 } as IDrawerStyle;
 		this.updateStyles();
-
-		/*window.addEventListener("resize", () => {
-			this.canvas.width = this.viewport.width;
-			this.canvas.height = this.viewport.height;
-		});*/
 	}
 
 	//#region Public methods

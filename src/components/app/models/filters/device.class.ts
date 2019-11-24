@@ -8,8 +8,9 @@ import Day from "../day.class";
  */
 export default class DeviceFilter extends Filter implements IFilter {
 	public platform: Platforms | null;
+	public type: string = "device";
 
-	public constructor(id: number | string, platform = null) {
+	public constructor(id: number | string, platform: Platforms | null = null) {
 		super(id);
 		this.platform = platform;
 	}

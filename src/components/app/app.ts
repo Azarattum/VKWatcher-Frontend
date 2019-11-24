@@ -79,7 +79,7 @@ export default class App {
 	}
 
 	private async initializeData(): Promise<void> {
-		const loader = new Loader(["assets/sessions.json"]);
+		const loader = new Loader(["/assets/sessions.json"]);
 		const data = await loader.load();
 
 		Users.initialize(data[0] as IUsersData);
@@ -95,7 +95,7 @@ export default class App {
 				device.platform || -1,
 				!empty.enabled
 			);
-			Overview.setUser(Users.selected);
+			Overview.updateUser(Users.selected);
 		});
 	}
 
@@ -143,29 +143,32 @@ export default class App {
 				) as PeriodFilter;
 				filter.from = from + offset - 1;
 				filter.to = to + offset - 1;
+				Overview.updateUser();
 			}
 		);
 		Interface.addEventListener("zoomed", (factor: number) => {
 			Hash.set("zoom", factor);
-			Overview.setZoom(factor);
 			(document.getElementsByClassName(
 				"page"
 			)[0] as HTMLElement).style.setProperty(
 				"--vertical-zoom",
 				factor.toString()
 			);
+			Overview.updateZoom(factor);
 		});
 		Interface.addEventListener("devicechanged", (id: number) => {
 			Hash.set("device", id);
 			//Update filter
 			const filter = Users.selected.getFilter("device") as DeviceFilter;
 			filter.platform = id;
+			Overview.updateUser();
 		});
 		Interface.addEventListener("emptychanged", (value: boolean) => {
 			Hash.set("empty", value);
 			//Update filter
 			const filter = Users.selected.getFilter("empty") as EmptyFilter;
 			filter.toggle(!value);
+			Overview.updateUser();
 		});
 	}
 

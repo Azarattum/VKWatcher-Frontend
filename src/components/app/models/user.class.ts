@@ -2,6 +2,9 @@ import DateUtils from "../../common/date.class";
 import IFilter from "./filters/filter.interface";
 import Day from "./day.class";
 import Session from "./session.class";
+import EmptyFilter from "./filters/empty.class";
+import PeriodFilter from "./filters/period.class";
+import DeviceFilter from "./filters/device.class";
 
 /**
  * Represents user with its data
@@ -139,5 +142,32 @@ export default class User {
 	 */
 	public clearFilters(): void {
 		this.filters = [];
+	}
+
+	public static fromObject(object: any): User {
+		object = Object.assign({}, object);
+
+		(object as any).__proto__ = User.prototype;
+		(object as User).filters.forEach(filter => {
+			switch (filter.type) {
+				case "empty":
+					(filter as any).__proto__ = EmptyFilter.prototype;
+					break;
+				case "device":
+					(filter as any).__proto__ = DeviceFilter.prototype;
+					break;
+				case "period":
+					(filter as any).__proto__ = PeriodFilter.prototype;
+					break;
+			}
+		});
+		Object.values((object as User).days).forEach(day => {
+			(day as any).__proto__ = Day.prototype;
+			(day as Day).sessions.forEach(session => {
+				(session as any).__proto__ = Session.prototype;
+			});
+		});
+
+		return object;
 	}
 }
