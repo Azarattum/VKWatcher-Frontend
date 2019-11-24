@@ -1,7 +1,7 @@
-import ChartElement from "./scripts/element/element.js";
-import DateUtils from "../../common/date.class.js";
-import Loader from "../../common/loader.class.js";
-import User from "../../app/data/user.class.js";
+import ChartElement from "./scripts/element/element";
+import DateUtils from "../../common/date.class";
+import Loader from "../../common/loader.class";
+import User from "../../app/models/user.class";
 
 export interface IShader {
 	fragmentSource: string;

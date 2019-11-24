@@ -1,5 +1,5 @@
 import Hash from "../common/hash.class.js";
-import DateUtils from "./data/utils.cls.js";
+import DateUtils from "./models/utils.cls.js.js";
 import Chart from "./chart/chart.cls.js";
 
 /**

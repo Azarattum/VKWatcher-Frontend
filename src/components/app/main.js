@@ -2,12 +2,12 @@
  * Main script
  */
 
-import User from "./data/user.cls.js";
-import Session from "./data/session.cls.js";
+import User from "./models/user.cls.js.js";
+import Session from "./models/session.cls.js.js";
 
-import EmptyFilter from "./data/filters/empty.cls.js";
-import DeviceFilter from "./data/filters/device.cls.js";
-import PeriodFilter from "./data/filters/period.cls.js";
+import EmptyFilter from "./models/filters/empty.cls.js.js";
+import DeviceFilter from "./models/filters/device.cls.js.js";
+import PeriodFilter from "./models/filters/period.cls.js.js";
 
 import Drawer from "./views/overview/drawer.cls.js.js";
 import Controller from "./views/overview/controller.cls.js.js";

@@ -1,0 +1,71 @@
+import Drawer from "./drawer.class";
+import User from "../../models/user.class";
+
+export default class Overview {
+	private static callbacks: { [type: string]: Function[] } = {};
+
+	private static drawer: Drawer | null = null;
+	private static user: User | null = null;
+	private static zoom: number | null = null;
+
+	public static initialize(): void {
+		const worker = new Worker(
+			"components/app/overview/overview.worker.js",
+			{ type: "module" }
+		);
+
+		const canvas = (document.getElementById(
+			"overview-render"
+		) as HTMLCanvasElement).transferControlToOffscreen();
+
+		worker.postMessage(
+			{
+				message: "initialize",
+				canvas: canvas
+			},
+			[(canvas as any) as Transferable]
+		);
+		console.log(worker);
+		/*this.drawer = new Drawer(
+			document.getElementById("overview-render") as HTMLCanvasElement,
+			this.user
+		);
+
+		const styles = window.getComputedStyle(
+			document.getElementsByClassName("page")[0]
+		);
+
+		const colors: string[] = [];
+		for (const platform in Platforms) {
+			colors[platform] = styles.getPropertyValue(
+				"--color-" + Platforms[platform]
+			);
+		}
+
+		this.drawer.colors = colors;
+		if (this.zoom) {
+			this.drawer.zoom = this.zoom;
+		}*/
+	}
+
+	public static setUser(user: User): void {
+		if (!this.drawer) {
+			this.user = user;
+			return;
+		}
+
+		this.drawer.user = user;
+		this.drawer.render();
+		console.log(this.drawer);
+	}
+
+	public static setZoom(factor: number): void {
+		if (!this.drawer) {
+			this.zoom = factor;
+			return;
+		}
+
+		this.drawer.zoom = factor;
+		this.drawer.render();
+	}
+}

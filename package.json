@@ -1,32 +1,34 @@
 {
-	"scripts": {
-		"build": "npm run build:css & npm run build:js & npm run build:html",
-		"watch": "./node_modules/.bin/npm-run-all --parallel watch:*",
-		"clean": "find ./dist -type f -name '*.include.*' -delete & find ./dist -type d -empty -delete",
-		"clean:win": "cd ./dist & del /S *.include.* & for /f \"delims=\" %d in ('dir /s /b /ad ^| sort /r') do rd \"%d\" /Q",
-		"build:html": "./node_modules/.bin/pug ./src -o ./dist -P --basedir ./",
-		"build:js": "./node_modules/.bin/tsc",
-		"build:css": "./node_modules/.bin/node-sass --recursive ./src/ --output ./dist/",
-		"watch:html": "./node_modules/.bin/pug ./src -o ./dist -P --basedir ./ -w",
-		"watch:js": "./node_modules/.bin/tsc -w",
-		"watch:css": "./node_modules/.bin/node-sass --watch --recursive ./src/ --output ./dist/"
-	},
-	"dependencies": {},
-	"devDependencies": {
-		"@types/jquery": "^3.3.31",
-		"@types/node": "^12.12.8",
-		"@typescript-eslint/eslint-plugin": "^2.7.0",
-		"@typescript-eslint/parser": "^2.7.0",
-		"eslint": "^6.6.0",
-		"eslint-plugin-import": "^2.18.2",
-		"eslint-plugin-node": "^10.0.0",
-		"eslint-plugin-promise": "^4.2.1",
-		"eslint-plugin-standard": "^4.0.1",
-		"node-sass": "^4.13.0",
-		"npm-run-all": "^4.1.5",
-		"prettier": "^1.19.1",
-		"pug": "^2.0.4",
-		"pug-cli": "^1.0.0-alpha6",
-		"typescript": "^3.7.2"
-	}
+  "scripts": {
+    "serve": "node_modules/.bin/webpack-dev-server",
+    "build": "node_modules/.bin/webpack-cli -d",
+    "watch": "node_modules/.bin/webpack-cli -d -w",
+    "release": "node_modules/.bin/webpack-cli -p"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jquery": "^3.3.31",
+    "@types/node": "^12.12.12",
+    "@typescript-eslint/eslint-plugin": "^2.8.0",
+    "@typescript-eslint/parser": "^2.8.0",
+    "css-loader": "^3.2.0",
+    "eslint": "^6.7.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "html-webpack-plugin": "^3.2.0",
+    "node-sass": "^4.13.0",
+    "prettier": "^1.19.1",
+    "pug": "^2.0.4",
+    "pug-loader": "^2.4.0",
+    "sass-loader": "^8.0.0",
+    "style-loader": "^1.0.0",
+    "ts-loader": "^6.2.1",
+    "typescript": "^3.7.2",
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^3.9.0",
+    "worker-loader": "^2.0.0"
+  }
 }
