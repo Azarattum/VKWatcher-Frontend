@@ -1,6 +1,6 @@
 import Drawer from "./drawer.class.js";
 import User from "../data/user.class.js";
-import { Platforms } from "../data/session.class.js";
+// import { Platforms } from "../data/session.class.js";
 
 export default class Overview {
 	private static callbacks: { [type: string]: Function[] } = {};
@@ -10,7 +10,24 @@ export default class Overview {
 	private static zoom: number | null = null;
 
 	public static initialize(): void {
-		this.drawer = new Drawer(
+		const worker = new Worker(
+			"components/app/overview/overview.worker.js",
+			{ type: "module" }
+		);
+
+		const canvas = (document.getElementById(
+			"overview-render"
+		) as HTMLCanvasElement).transferControlToOffscreen();
+
+		worker.postMessage(
+			{
+				message: "initialize",
+				canvas: canvas
+			},
+			[(canvas as any) as Transferable]
+		);
+		console.log(worker);
+		/*this.drawer = new Drawer(
 			document.getElementById("overview-render") as HTMLCanvasElement,
 			this.user
 		);
@@ -29,7 +46,7 @@ export default class Overview {
 		this.drawer.colors = colors;
 		if (this.zoom) {
 			this.drawer.zoom = this.zoom;
-		}
+		}*/
 	}
 
 	public static setUser(user: User): void {
@@ -50,6 +67,7 @@ export default class Overview {
 		}
 
 		this.drawer.zoom = factor;
+		this.drawer.render();
 	}
 
 	public static addEventListener(type: "", callback: Function): void {

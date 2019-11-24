@@ -6,18 +6,24 @@ import Day from "../data/day.class.js";
  */
 export default class Drawer {
 	public user: User | null;
-	private canvas: HTMLCanvasElement;
-	private context: CanvasRenderingContext2D;
-	private updateRequested: boolean;
-	private _styles: IDrawerStyle;
+	private canvas: HTMLCanvasElement | OffscreenCanvas;
+	private context:
+		| OffscreenCanvasRenderingContext2D
+		| CanvasRenderingContext2D;
+	private styles: IDrawerStyle;
+	private stylesCache: CSSStyleDeclaration;
 
 	/**
 	 * Creates a new drawer object
 	 * @param {Element} canvas HTML Canvas element
 	 * @param {User} user User object
 	 */
-	public constructor(canvas: HTMLCanvasElement, user: User | null = null) {
+	public constructor(
+		canvas: HTMLCanvasElement | OffscreenCanvas,
+		user: User | null = null
+	) {
 		const ctx = canvas.getContext("2d");
+
 		if (!ctx) {
 			throw new Error("Unable to get canvas context!");
 		}
@@ -25,13 +31,14 @@ export default class Drawer {
 		this.canvas = canvas;
 		this.context = ctx;
 		this.user = user;
-		this.updateRequested = true;
-		this._styles = { zoom: 1 } as IDrawerStyle;
+		this.stylesCache = {} as CSSStyleDeclaration;
+		this.styles = { zoom: 1 } as IDrawerStyle;
+		this.updateStyles();
 
-		window.addEventListener("resize", () => {
+		/*window.addEventListener("resize", () => {
 			this.canvas.width = this.viewport.width;
 			this.canvas.height = this.viewport.height;
-		});
+		});*/
 	}
 
 	//#region Public methods
@@ -48,6 +55,36 @@ export default class Drawer {
 			this.drawData(this.context, days);
 		}
 	}
+
+	/**
+	 * Updates drawing styles
+	 */
+	public updateStyles(cssStyles: CSSStyleDeclaration | null = null): void {
+		if (!cssStyles) {
+			cssStyles = this.stylesCache;
+		} else {
+			this.stylesCache = cssStyles;
+		}
+
+		this.styles.column = {
+			margin: 4
+		};
+
+		this.styles.date = {
+			height: 48,
+			font: cssStyles.fontFamily || "Arial",
+			color: cssStyles.color || "black"
+		};
+
+		this.styles.time = {
+			margin: this.viewport.height / this.styles.zoom / 96,
+			left: 8,
+			fontSize: (this.viewport.height / this.styles.zoom - 48) / 24,
+			size: (this.viewport.height - this.styles.date.height) / 24,
+			font: cssStyles.fontFamily || "Arial",
+			color: cssStyles.color || "black"
+		};
+	}
 	//#endregion
 
 	//#region Properties
@@ -56,8 +93,8 @@ export default class Drawer {
 	 * @param factor New vertical zooming factor
 	 */
 	public set zoom(factor: number) {
-		this._styles.zoom = factor;
-		this.updateRequested = true;
+		this.styles.zoom = factor;
+		this.updateStyles();
 	}
 
 	/**
@@ -73,46 +110,17 @@ export default class Drawer {
 	 */
 	private get viewport(): { width: number; height: number } {
 		return {
-			width: this.canvas.clientWidth * window.devicePixelRatio,
-			height: this.canvas.clientHeight * window.devicePixelRatio
+			width: this.canvas.width,
+			height: this.canvas.height
 		};
-	}
-
-	/**
-	 * Drawing styles
-	 */
-	private get styles(): IDrawerStyle {
-		if (!this.updateRequested) {
-			return this._styles;
-		}
-
-		const canvasStyle = window.getComputedStyle(this.canvas);
-
-		this._styles.column = {
-			margin: 4
-		};
-
-		this._styles.date = {
-			height: 48,
-			font: canvasStyle.fontFamily,
-			color: canvasStyle.color || "black"
-		};
-
-		this._styles.time = {
-			margin: this.viewport.height / this._styles.zoom / 96,
-			left: 8,
-			fontSize: (this.viewport.height / this._styles.zoom - 48) / 24,
-			size: (this.viewport.height - this._styles.date.height) / 24,
-			font: canvasStyle.fontFamily,
-			color: canvasStyle.color || "black"
-		};
-
-		return this._styles;
 	}
 	//#endregion
 
 	//#region Private methods
-	private drawData(ctx: CanvasRenderingContext2D, days: Day[]): void {
+	private drawData(
+		ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
+		days: Day[]
+	): void {
 		//Define constants
 		const left = this.styles.time.fontSize * 3;
 		const margin = this.styles.column.margin;
@@ -215,7 +223,9 @@ export default class Drawer {
 		}
 	}
 
-	private drawTime(ctx: CanvasRenderingContext2D): void {
+	private drawTime(
+		ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D
+	): void {
 		const margin = this.styles.time.margin;
 		const fontSize = this.styles.time.fontSize;
 		const size = this.styles.time.size;
@@ -235,7 +245,7 @@ export default class Drawer {
 	}
 
 	private shadeRect(
-		ctx: CanvasRenderingContext2D,
+		ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D,
 		x = 0,
 		y = 0,
 		width = 0,
