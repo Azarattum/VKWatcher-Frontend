@@ -24,6 +24,3 @@ npm install --dev
 | build     | Builds the entire project with webpack                  |
 | watch     | Watches all file changes and rebuilds them if necessary |
 | release   | Creates a production build of the project               |
-
-### TODO:
-  - Add proxy to filter updates in users service
