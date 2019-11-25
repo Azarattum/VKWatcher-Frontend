@@ -9,12 +9,12 @@ Front end web application for processing data from VKWatcher-Backend
   - And more...
 
 ### Usage:
-Start your web server from *./dist* folder.
+Start your web server from *./dist* folder. Note that **sessions.json** is requested from */assets/* by now.
 
-### Installation (DEV): 
-Install all the development dependencies:
+### Installation: 
+Install all dependencies:
 ```sh
-npm install --dev
+npm install
 ```
 
 ### NPM Scripts:
