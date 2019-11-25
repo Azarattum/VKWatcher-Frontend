@@ -29,4 +29,9 @@ export default interface IFilter {
 	 * @param {Boolean} value Enable or disable the filter.
 	 */
 	toggle(value?: boolean): void;
+
+	/**
+	 * Converts to an object
+	 */
+	toObject(): any;
 }

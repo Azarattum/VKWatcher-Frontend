@@ -50,7 +50,7 @@ export default class Overview {
 
 		this.worker.postMessage({
 			message: "updateUser",
-			user: this.user
+			user: this.user.toObject()
 		});
 	}
 

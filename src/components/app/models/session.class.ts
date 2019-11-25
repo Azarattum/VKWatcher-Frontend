@@ -105,6 +105,13 @@ export default class Session {
 
 		return sessions;
 	}
+
+	/**
+	 * Converts to an object
+	 */
+	public toObject(): any {
+		return Object.assign({}, this);
+	}
 }
 
 /**

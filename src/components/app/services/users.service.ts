@@ -1,8 +1,4 @@
-import EmptyFilter from "../models/filters/empty.class";
-import DeviceFilter from "../models/filters/device.class";
-import PeriodFilter from "../models/filters/period.class";
 import User from "../models/user.class";
-import Session from "../models/session.class";
 
 export default class Users {
 	public static data: User[] = [];
@@ -13,6 +9,7 @@ export default class Users {
 	public static get selectedId(): number {
 		return this._selectedId;
 	}
+
 	public static get selected(): User {
 		return this.data[this._selectedId];
 	}
@@ -21,33 +18,9 @@ export default class Users {
 		//Iterate through all users in data
 		for (const id in data) {
 			const userData = data[id];
-			//Create user object
-			const user = new User(userData.name, +id);
+			(userData as any).id = id;
 
-			//Add sessions
-			for (const session of userData.sessions) {
-				if (session.from !== undefined) {
-					user.addSession(
-						new Session(session.from, session.to, session.platform)
-					);
-				}
-			}
-
-			//Add filters
-			const empty = new EmptyFilter("empty");
-			const device = new DeviceFilter("device");
-			const period = new PeriodFilter("period");
-
-			//Setup filters
-			const days = Object.keys(user.days);
-			empty.toggle(false);
-			period.from = +days[0];
-			period.to = +days[days.length - 1];
-
-			//Register filters
-			user.addFilter(empty);
-			user.addFilter(device);
-			user.addFilter(period);
+			const user = User.fromObject(userData);
 
 			//Save user to an array
 			this.data.push(user);
@@ -62,6 +35,16 @@ export default class Users {
 			this._selectedId = id;
 			this.call("userchanged");
 		}
+	}
+
+	public static updateFilter(id: number | string, params: any): void {
+		const filter = this.selected.getFilter(id);
+
+		for (const param of Object.entries(params)) {
+			(filter as any)[param[0]] = param[1];
+		}
+
+		this.call("dataupdated");
 	}
 
 	public static addEventListener(

@@ -96,4 +96,19 @@ export default class Day {
 		if (filter.passDay(day)) return day;
 		return null;
 	}
+
+	/**
+	 * Converts to an object
+	 */
+	public toObject(): any {
+		const object = Object.assign({}, this);
+
+		//Convert sessions
+		object.sessions = [];
+		for (const i in this.sessions) {
+			object.sessions.push(this.sessions[i].toObject());
+		}
+
+		return object;
+	}
 }

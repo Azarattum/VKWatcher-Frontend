@@ -14,15 +14,17 @@ module.exports = {
 			{
 				test: /\.ts$/,
 				use: "ts-loader",
-				exclude: /node_modules/
+				exclude: /(node_modules|\.gir)/
 			},
 			{
 				test: /\.pug$/,
-				use: ["pug-loader"]
+				use: ["pug-loader"],
+				exclude: /(node_modules|\.gir)/
 			},
 			{
 				test: /\.scss$/,
-				use: ["style-loader", "css-loader", "sass-loader"]
+				use: ["style-loader", "css-loader", "sass-loader"],
+				exclude: /(node_modules|\.gir)/
 			}
 		]
 	},

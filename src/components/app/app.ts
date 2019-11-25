@@ -83,6 +83,7 @@ export default class App {
 		const data = await loader.load();
 
 		Users.initialize(data[0] as IUsersData);
+		//User Changed Event
 		Users.addEventListener("userchanged", () => {
 			const days = Object.keys(Users.selected.days).map(x => +x);
 			const period = Users.selected.getFilter("period") as PeriodFilter;
@@ -96,6 +97,11 @@ export default class App {
 				!empty.enabled
 			);
 			Overview.updateUser(Users.selected);
+		});
+
+		//User Updated Event
+		Users.addEventListener("dataupdated", () => {
+			Overview.updateUser();
 		});
 	}
 
@@ -126,6 +132,8 @@ export default class App {
 
 	private async initializeInterface(): Promise<void> {
 		Interface.initialize(Users.data.map(x => x.name));
+
+		//User Changed Event
 		Interface.addEventListener(
 			"userchanged",
 			(id: number, relative?: boolean) => {
@@ -133,19 +141,21 @@ export default class App {
 				Hash.set("user", Users.selectedId);
 			}
 		);
+
+		//Period Changed Event
 		Interface.addEventListener(
 			"periodchanged",
-			(from: number, to: number, offset: number) => {
+			(from: number, to: number, offset: number, update: boolean) => {
 				Hash.set("period", from + "-" + to);
-				//Update filter
-				const filter = Users.selected.getFilter(
-					"period"
-				) as PeriodFilter;
-				filter.from = from + offset - 1;
-				filter.to = to + offset - 1;
-				Overview.updateUser();
+				if (!update) return;
+				Users.updateFilter("period", {
+					from: from + offset - 1,
+					to: to + offset - 1
+				});
 			}
 		);
+
+		//Zoomed Event
 		Interface.addEventListener("zoomed", (factor: number) => {
 			Hash.set("zoom", factor);
 			(document.getElementsByClassName(
@@ -156,20 +166,30 @@ export default class App {
 			);
 			Overview.updateZoom(factor);
 		});
-		Interface.addEventListener("devicechanged", (id: number) => {
-			Hash.set("device", id);
-			//Update filter
-			const filter = Users.selected.getFilter("device") as DeviceFilter;
-			filter.platform = id;
-			Overview.updateUser();
-		});
-		Interface.addEventListener("emptychanged", (value: boolean) => {
-			Hash.set("empty", value);
-			//Update filter
-			const filter = Users.selected.getFilter("empty") as EmptyFilter;
-			filter.toggle(!value);
-			Overview.updateUser();
-		});
+
+		//Device Changed Event
+		Interface.addEventListener(
+			"devicechanged",
+			(id: number, update: boolean) => {
+				Hash.set("device", id);
+				if (!update) return;
+				Users.updateFilter("device", {
+					platform: id
+				});
+			}
+		);
+
+		//Empty Toggled Event
+		Interface.addEventListener(
+			"emptychanged",
+			(value: boolean, update: boolean) => {
+				Hash.set("empty", value);
+				if (!update) return;
+				Users.updateFilter("empty", {
+					enabled: !value
+				});
+			}
+		);
 	}
 
 	private async initializeOverview(): Promise<void> {

@@ -52,18 +52,19 @@ export default class Interface {
 
 		//Interface functions
 		(window as any).changeUser = (id: number, relative: boolean): void => {
-			this.call("userchanged", id, relative);
+			this.call("userchanged", id, relative, true);
 		};
 
 		(window as any).changeEmpty = (event: MouseEvent): void => {
 			this.call(
 				"emptychanged",
-				(event.target as HTMLInputElement).checked
+				(event.target as HTMLInputElement).checked,
+				true
 			);
 		};
 
 		(window as any).changeDevice = (id: number): void => {
-			this.call("devicechanged", id);
+			this.call("devicechanged", id, true);
 		};
 
 		(window as any).openProfile = (event: MouseEvent): void => {
@@ -105,9 +106,9 @@ export default class Interface {
 		to = to - days[0] + 1;
 
 		//Call filter updates
-		this.call("periodchanged", from, to, days[0]);
-		this.call("devicechanged", platform);
-		this.call("emptychanged", empty);
+		this.call("periodchanged", from, to, days[0], !!zoom);
+		this.call("devicechanged", platform, !!zoom);
+		this.call("emptychanged", empty, !!zoom);
 		if (zoom) {
 			this.call("zoomed", zoom);
 		}

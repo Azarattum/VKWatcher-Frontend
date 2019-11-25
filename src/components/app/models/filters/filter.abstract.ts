@@ -20,4 +20,11 @@ export default abstract class Filter {
 			this.enabled = value;
 		}
 	}
+
+	/**
+	 * Converts to an object
+	 */
+	public toObject(): any {
+		return Object.assign({}, this);
+	}
 }

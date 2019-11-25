@@ -3,8 +3,8 @@ import IFilter from "./filters/filter.interface";
 import Day from "./day.class";
 import Session from "./session.class";
 import EmptyFilter from "./filters/empty.class";
-import PeriodFilter from "./filters/period.class";
 import DeviceFilter from "./filters/device.class";
+import PeriodFilter from "./filters/period.class";
 
 /**
  * Represents user with its data
@@ -144,30 +144,100 @@ export default class User {
 		this.filters = [];
 	}
 
-	public static fromObject(object: any): User {
-		object = Object.assign({}, object);
+	/**
+	 * Converts to an object
+	 */
+	public toObject(): any {
+		const object = Object.assign({}, this);
 
-		(object as any).__proto__ = User.prototype;
-		(object as User).filters.forEach(filter => {
-			switch (filter.type) {
-				case "empty":
-					(filter as any).__proto__ = EmptyFilter.prototype;
-					break;
-				case "device":
-					(filter as any).__proto__ = DeviceFilter.prototype;
-					break;
-				case "period":
-					(filter as any).__proto__ = PeriodFilter.prototype;
-					break;
-			}
-		});
-		Object.values((object as User).days).forEach(day => {
-			(day as any).__proto__ = Day.prototype;
-			(day as Day).sessions.forEach(session => {
-				(session as any).__proto__ = Session.prototype;
-			});
-		});
+		//Convert days
+		object.days = {};
+		for (const i in this.days) {
+			object.days[i] = this.days[i].toObject();
+		}
+
+		//Convert filters
+		object.filters = [];
+		for (const i in this.filters) {
+			object.filters.push(this.filters[i].toObject());
+		}
 
 		return object;
+	}
+
+	/**
+	 * Creates a user from object
+	 * @param object User object
+	 */
+	public static fromObject(object: any): User {
+		//Create user object
+		const user = new User(object.name, +object.id);
+
+		//Add sessions
+		if (object.sessions) {
+			//From sessions
+			for (const session of object.sessions) {
+				if (session.from !== undefined) {
+					user.addSession(
+						new Session(session.from, session.to, session.platform)
+					);
+				}
+			}
+		} else if (object.days) {
+			//From days
+			for (const day of Object.values(object.days) as Day[]) {
+				if (!day.sessions) continue;
+				for (const session of day.sessions) {
+					if (session.from !== undefined) {
+						user.addSession(
+							new Session(
+								session.from,
+								session.to,
+								session.platform
+							)
+						);
+					}
+				}
+			}
+		}
+
+		if (!object.filters) {
+			//Add filters
+			const empty = new EmptyFilter("empty");
+			const device = new DeviceFilter("device");
+			const period = new PeriodFilter("period");
+
+			//Setup filters
+			const days = Object.keys(user.days);
+			empty.toggle(false);
+			period.from = +days[0];
+			period.to = +days[days.length - 1];
+
+			//Register filters
+			user.addFilter(empty);
+			user.addFilter(device);
+			user.addFilter(period);
+		} else {
+			const filters = (object as User).filters;
+			//Setup preexisting filters
+			filters.forEach(filter => {
+				filter = Object.assign({}, filter);
+				switch (filter.type) {
+					case "empty":
+						(filter as any).__proto__ = EmptyFilter.prototype;
+						break;
+					case "device":
+						(filter as any).__proto__ = DeviceFilter.prototype;
+						break;
+					case "period":
+						(filter as any).__proto__ = PeriodFilter.prototype;
+						break;
+				}
+
+				user.addFilter(filter);
+			});
+		}
+
+		return user;
 	}
 }
