@@ -1,12 +1,14 @@
-/**
- * View renderer
- */
 import "./chart.scss";
 import Template from "./chart.pug";
+import View from "../../../common/view.abstract";
 
-window.addEventListener("load", () => {
-	const container = document.querySelector("[view=chart]");
-	if (container) {
-		container.innerHTML = Template();
+/**
+ * Chart view
+ */
+export default class Chart extends View {
+	public constructor() {
+		super("Chart");
+
+		this.template = Template();
 	}
-});
+}

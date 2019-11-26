@@ -38,7 +38,9 @@ export default class Utils {
 
 			case LogType.DIVIDER: {
 				const divider = "=".repeat(30 - text.length / 2);
-				console.log(divider + text + divider);
+				console.log(
+					divider + text + divider + (text.length % 2 ? "=" : "")
+				);
 				break;
 			}
 

@@ -1,12 +1,14 @@
-/**
- * View renderer
- */
 import "./analysis.scss";
 import Template from "./analysis.pug";
+import View from "../../../common/view.abstract";
 
-window.addEventListener("load", () => {
-	const container = document.querySelector("[view=analysis]");
-	if (container) {
-		container.innerHTML = Template();
+/**
+ * Analysis view
+ */
+export default class Analysis extends View {
+	public constructor() {
+		super("Analysis");
+
+		this.template = Template();
 	}
-});
+}

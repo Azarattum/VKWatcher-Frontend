@@ -1,12 +1,14 @@
-/**
- * View renderer
- */
 import "./filters.scss";
 import Template from "./filters.pug";
+import View from "../../../common/view.abstract";
 
-window.addEventListener("load", () => {
-	const container = document.querySelector("[view=filters]");
-	if (container) {
-		container.innerHTML = Template();
+/**
+ * Filters view
+ */
+export default class Filters extends View {
+	public constructor() {
+		super("Filters");
+
+		this.template = Template();
 	}
-});
+}

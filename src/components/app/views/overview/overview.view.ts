@@ -1,12 +1,14 @@
-/**
- * View renderer
- */
 import "./overview.scss";
 import Template from "./overview.pug";
+import View from "../../../common/view.abstract";
 
-window.addEventListener("load", () => {
-	const container = document.querySelector("[view=overview]");
-	if (container) {
-		container.innerHTML = Template();
+/**
+ * Overview view
+ */
+export default class Overview extends View {
+	public constructor() {
+		super("Overview");
+
+		this.template = Template();
 	}
-});
+}

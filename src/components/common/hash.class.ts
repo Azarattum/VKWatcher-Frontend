@@ -2,18 +2,25 @@
  * Class to work with URL hash
  */
 export default class Hash {
+	private static callbacks: { [type: string]: Function[] } = {};
+
 	/**
 	 * Initializes URL Hash object
 	 * @param {Object} defaults Default values for hash
 	 */
 	public static initialize(defaults: { [property: string]: any }): void {
+		const properties: { [name: string]: string } = {};
+
 		for (const key in defaults) {
 			if (this.exists(key)) {
 				continue;
 			}
 			const value = defaults[key];
 			this.set(key, value.toString());
+			properties[key] = value.toString();
 		}
+
+		this.call("loaded", properties);
 	}
 
 	/**
@@ -78,6 +85,17 @@ export default class Hash {
 			string.toString().indexOf(":") != -1
 		) {
 			throw new Error("Illegal characters in property!");
+		}
+	}
+
+	public static addEventListener(type: "loaded", callback: Function): void {
+		if (!(type in this.callbacks)) this.callbacks[type] = [];
+		this.callbacks[type].push(callback);
+	}
+
+	public static call(type: "loaded", ...args: any[]): void {
+		if (this.callbacks[type]) {
+			this.callbacks[type].map(x => x.call(x, ...args));
 		}
 	}
 }

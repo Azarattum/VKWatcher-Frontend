@@ -1,5 +1,8 @@
 import User from "../models/user.class";
 
+/**
+ * Service for managing users
+ */
 export default class Users {
 	public static data: User[] = [];
 

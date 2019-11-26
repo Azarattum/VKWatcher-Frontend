@@ -8,14 +8,16 @@ export default class Overview {
 	private static selector: Selector;
 	private static user: User | null = null;
 	private static zoom: number | null = null;
-	private static canvas: HTMLCanvasElement;
+	private static canvas: HTMLCanvasElement | null;
 
 	public static initialize(): void {
-		this.worker = new Worker();
+		const canvas = document.getElementById("overview-render");
+		if (!canvas) {
+			throw new Error("Container for overview render not found!");
+		}
 
-		this.canvas = document.getElementById(
-			"overview-render"
-		) as HTMLCanvasElement;
+		this.worker = new Worker();
+		this.canvas = canvas as HTMLCanvasElement;
 		const offscreenCanvas = this.canvas.transferControlToOffscreen();
 
 		this.worker.postMessage(
@@ -138,6 +140,9 @@ export default class Overview {
 	 */
 	private static updateViewport(width?: number, height?: number): void {
 		if (!this.worker) return;
+		if (!this.canvas) {
+			throw new Error("Overview canvas container not found!");
+		}
 
 		if (!width) {
 			width = this.canvas.clientWidth * devicePixelRatio;
