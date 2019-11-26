@@ -1,9 +1,14 @@
 import Slider from "../../vendor/slider/slider";
 import DateUtils from "../../common/date.class";
+import Service from "../../common/service.abstract";
 
-export default class Interface {
-	private static callbacks: { [type: string]: Function[] } = {};
-
+export default class Interface extends Service<
+	| "zoomed"
+	| "userchanged"
+	| "periodchanged"
+	| "emptychanged"
+	| "devicechanged"
+>() {
 	private static periodSlider: Slider;
 	private static zoomSlider: Slider;
 	private static emptyButton: HTMLInputElement;
@@ -111,33 +116,6 @@ export default class Interface {
 		this.call("emptychanged", empty, !!zoom);
 		if (zoom) {
 			this.call("zoomed", zoom);
-		}
-	}
-
-	public static addEventListener(
-		type:
-			| "zoomed"
-			| "userchanged"
-			| "periodchanged"
-			| "emptychanged"
-			| "devicechanged",
-		callback: Function
-	): void {
-		if (!(type in this.callbacks)) this.callbacks[type] = [];
-		this.callbacks[type].push(callback);
-	}
-
-	public static call(
-		type:
-			| "zoomed"
-			| "userchanged"
-			| "periodchanged"
-			| "emptychanged"
-			| "devicechanged",
-		...args: any[]
-	): void {
-		if (this.callbacks[type]) {
-			this.callbacks[type].map(x => x.call(x, ...args));
 		}
 	}
 }

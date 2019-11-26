@@ -1,8 +1,11 @@
+import Service from "./service.abstract";
+
 /**
  * Class to work with URL hash
  */
-export default class Hash {
-	private static callbacks: { [type: string]: Function[] } = {};
+export default class Hash extends Service<"loaded">() {
+	/** Whether the hash is frozen from changes */
+	private static frozen: boolean = false;
 
 	/**
 	 * Initializes URL Hash object
@@ -12,9 +15,12 @@ export default class Hash {
 		const properties: { [name: string]: string } = {};
 
 		for (const key in defaults) {
-			if (this.exists(key)) {
+			const existing = this.get(key);
+			if (existing) {
+				properties[key] = existing;
 				continue;
 			}
+
 			const value = defaults[key];
 			this.set(key, value.toString());
 			properties[key] = value.toString();
@@ -42,10 +48,20 @@ export default class Hash {
 	}
 
 	/**
+	 * Freezes hash from changes untils it is unfrozen
+	 * @param frozen Whether the hash frozen
+	 */
+	public static freeze(frozen: boolean = true): void {
+		this.frozen = frozen;
+	}
+
+	/**
 	 * Sets the value of hash property
 	 * @param {String} propertyName Name of a property
 	 */
 	public static set(property: string, value: any): void {
+		if (this.frozen) return;
+
 		value = value.toString();
 		const hash = window.location.hash;
 		this.validateString(property);
@@ -85,17 +101,6 @@ export default class Hash {
 			string.toString().indexOf(":") != -1
 		) {
 			throw new Error("Illegal characters in property!");
-		}
-	}
-
-	public static addEventListener(type: "loaded", callback: Function): void {
-		if (!(type in this.callbacks)) this.callbacks[type] = [];
-		this.callbacks[type].push(callback);
-	}
-
-	public static call(type: "loaded", ...args: any[]): void {
-		if (this.callbacks[type]) {
-			this.callbacks[type].map(x => x.call(x, ...args));
 		}
 	}
 }

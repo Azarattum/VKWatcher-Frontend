@@ -9,6 +9,6 @@ export default class Analysis extends View {
 	public constructor() {
 		super("Analysis");
 
-		this.template = Template();
+		this.template = Template;
 	}
 }

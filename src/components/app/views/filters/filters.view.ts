@@ -9,6 +9,6 @@ export default class Filters extends View {
 	public constructor() {
 		super("Filters");
 
-		this.template = Template();
+		this.template = Template;
 	}
 }

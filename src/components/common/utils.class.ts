@@ -2,6 +2,11 @@
  * Some useful utilities
  */
 export default class Utils {
+	/**
+	 * Logs formatted text to the developer console
+	 * @param text Text to log out
+	 * @param type Custom type of the message
+	 */
 	public static log(text: string, type: LogType = LogType.INFO): void {
 		const date = new Date().toTimeString().split(" ")[0];
 		const prefix = `[${date}]: `;
@@ -50,6 +55,9 @@ export default class Utils {
 	}
 }
 
+/**
+ * Logging message type
+ */
 export enum LogType {
 	INFO,
 	OK,

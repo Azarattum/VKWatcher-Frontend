@@ -1,4 +1,4 @@
-import Hash from "../common/hash.class.js";
+import Hash from "../common/hash.service.js";
 import DateUtils from "./models/utils.cls.js.js";
 import Chart from "./chart/chart.cls.js";
 

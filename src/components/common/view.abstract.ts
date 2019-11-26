@@ -3,14 +3,14 @@
  */
 export default abstract class View {
 	public readonly name: string;
-	protected template: string | null;
+	protected template: Function | null;
 	private windowLoaded: boolean;
 
 	/**
 	 * Creates new view component
 	 * @param name The name of view
 	 */
-	public constructor(name: string, template: string | null = null) {
+	public constructor(name: string, template: Function | null = null) {
 		this.name = name;
 		this.windowLoaded = document.readyState === "complete";
 		this.template = template;
@@ -28,22 +28,25 @@ export default abstract class View {
 	 * Renders the content to the view's container
 	 * @param content View content
 	 */
-	public render(content: string | null = null): void {
+	public render(template: Function | null = null, args: {} = {}): void {
 		if (!this.windowLoaded) {
-			this.template = content;
+			this.template = template;
 			return;
 		}
-		if (!content) {
-			content = this.template;
+		if (!template) {
+			template = this.template;
 		}
-		if (!content) return;
+		if (!args) {
+			args = {};
+		}
+		if (!template) return;
 
 		const container = document.querySelector(
 			`[view=${this.name.toLowerCase()}]`
 		);
 
 		if (container) {
-			container.innerHTML = content;
+			container.innerHTML = template(args);
 			this.template = null;
 		} else {
 			throw new Error(

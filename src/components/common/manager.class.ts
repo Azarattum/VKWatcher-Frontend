@@ -7,14 +7,16 @@ import View from "./view.abstract";
 export default class Manager {
 	/**Whether to log out initialization status */
 	public logging: boolean = true;
-	private components: IInitializable[];
-	private views: View[];
+	/**Managed components */
+	public readonly components: IComponent[];
+	/**Managed views */
+	public readonly views: View[];
 
 	/**
 	 * Creates a component manager
 	 * @param components Components to manage
 	 */
-	public constructor(components: IInitializable[], views: View[] = []) {
+	public constructor(components: IComponent[], views: View[] = []) {
 		this.components = components;
 		this.views = views;
 	}
@@ -22,14 +24,22 @@ export default class Manager {
 	/**
 	 * Initializes all components
 	 */
-	public async initialize(): Promise<void> {
+	public async initialize(
+		componentArgs: any[][] = [],
+		viewArgs: {}[] = []
+	): Promise<void> {
 		let exceptions = 0;
 		if (this.logging) Utils.log("Initializtion started...");
 		//Render all views
 		if (this.logging) Utils.log("Views", LogType.DIVIDER);
-		for (const view of this.views) {
+		for (const i in this.views) {
+			const view = this.views[i];
 			try {
-				await view.render();
+				if (viewArgs[i]) {
+					await view.render(null, viewArgs[i]);
+				} else {
+					await view.render();
+				}
 				if (this.logging) {
 					Utils.log(`${view.name} rendered!`, LogType.OK);
 				}
@@ -47,9 +57,14 @@ export default class Manager {
 
 		//Initialize all components
 		if (this.logging) Utils.log("Components", LogType.DIVIDER);
-		for (const component of this.components) {
+		for (const i in this.components) {
+			const component = this.components[i];
 			try {
-				await component.initialize();
+				if (componentArgs[i]) {
+					await component.initialize(...componentArgs[i]);
+				} else {
+					await component.initialize();
+				}
 				if (this.logging) {
 					Utils.log(`${component.name} initialized!`, LogType.OK);
 				}
@@ -82,7 +97,7 @@ export default class Manager {
 	 * Returs a managed component by its name
 	 * @param name Component's name
 	 */
-	public getComponent(name: string): IInitializable | null {
+	public getComponent(name: string): IComponent | null {
 		return (
 			this.components.find(component => component.name == name) || null
 		);
@@ -100,10 +115,10 @@ export default class Manager {
 /**
  * Interface of an initializable class
  */
-export interface IInitializable {
+export interface IComponent {
 	/**Initializable name */
 	name: string;
 
 	/**Initializable entry */
-	initialize(): void;
+	initialize(...args: any[]): void;
 }

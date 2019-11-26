@@ -9,6 +9,6 @@ export default class Overview extends View {
 	public constructor() {
 		super("Overview");
 
-		this.template = Template();
+		this.template = Template;
 	}
 }

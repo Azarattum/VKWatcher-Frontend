@@ -1,20 +1,19 @@
 import User from "../models/user.class";
+import Service from "../../common/service.abstract";
 
 /**
  * Service for managing users
  */
-export default class Users {
+export default class Users extends Service<"dataupdated" | "userchanged">() {
 	public static data: User[] = [];
-
-	private static _selectedId: number = 0;
-	private static callbacks: { [type: string]: Function[] } = {};
+	private static id: number = 0;
 
 	public static get selectedId(): number {
-		return this._selectedId;
+		return this.id;
 	}
 
 	public static get selected(): User {
-		return this.data[this._selectedId];
+		return this.data[this.id];
 	}
 
 	public static initialize(data: IUsersData): void {
@@ -32,10 +31,10 @@ export default class Users {
 	}
 
 	public static select(id: number, relative: boolean = false): void {
-		if (relative) id += this._selectedId;
+		if (relative) id += this.id;
 
 		if (this.data[id]) {
-			this._selectedId = id;
+			this.id = id;
 			this.call("userchanged");
 		}
 	}
@@ -48,23 +47,6 @@ export default class Users {
 		}
 
 		this.call("dataupdated");
-	}
-
-	public static addEventListener(
-		type: "dataupdated" | "userchanged",
-		callback: Function
-	): void {
-		if (!(type in this.callbacks)) this.callbacks[type] = [];
-		this.callbacks[type].push(callback);
-	}
-
-	public static call(
-		type: "dataupdated" | "userchanged",
-		...args: any[]
-	): void {
-		if (this.callbacks[type]) {
-			this.callbacks[type].map(x => x.call(x, ...args));
-		}
 	}
 }
 

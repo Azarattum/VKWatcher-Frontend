@@ -9,6 +9,6 @@ export default class Chart extends View {
 	public constructor() {
 		super("Chart");
 
-		this.template = Template();
+		this.template = Template;
 	}
 }
