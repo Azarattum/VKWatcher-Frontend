@@ -98,7 +98,7 @@ export default class Interface {
 			onChange: data => {
 				from = data.from - days[0] + 1;
 				to = data.to - days[0] + 1;
-				this.call("periodchanged", from, to, days[0]);
+				this.call("periodchanged", from, to, days[0], true);
 			}
 		});
 

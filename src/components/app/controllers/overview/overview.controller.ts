@@ -1,19 +1,22 @@
 import User from "../../models/user.class";
 import Worker from "worker-loader!./overview.worker";
 import { Platforms } from "../../models/session.class";
+import Selector from "./selector.class";
 
 export default class Overview {
 	private static worker: Worker;
+	private static selector: Selector;
 	private static user: User | null = null;
 	private static zoom: number | null = null;
+	private static canvas: HTMLCanvasElement;
 
 	public static initialize(): void {
 		this.worker = new Worker();
 
-		const canvas = document.getElementById(
+		this.canvas = document.getElementById(
 			"overview-render"
 		) as HTMLCanvasElement;
-		const offscreenCanvas = canvas.transferControlToOffscreen();
+		const offscreenCanvas = this.canvas.transferControlToOffscreen();
 
 		this.worker.postMessage(
 			{
@@ -23,16 +26,11 @@ export default class Overview {
 			[(offscreenCanvas as any) as Transferable]
 		);
 
+		this.selector = new Selector(this.canvas, this.user);
+
 		window.addEventListener("resize", () => {
-			this.updateViewport(
-				canvas.clientWidth * devicePixelRatio,
-				canvas.clientHeight * devicePixelRatio
-			);
+			this.updateViewport();
 		});
-		this.updateViewport(
-			canvas.clientWidth * devicePixelRatio,
-			canvas.clientHeight * devicePixelRatio
-		);
 
 		this.updateZoom();
 		this.updateColors();
@@ -52,6 +50,10 @@ export default class Overview {
 			message: "updateUser",
 			user: this.user.toObject()
 		});
+
+		if (this.selector) {
+			this.selector.user = this.user;
+		}
 	}
 
 	/**
@@ -66,6 +68,12 @@ export default class Overview {
 			message: "updateZoom",
 			factor: this.zoom
 		});
+
+		this.updateViewport();
+
+		if (this.selector) {
+			this.selector.zoom = this.zoom;
+		}
 	}
 
 	/**
@@ -73,6 +81,8 @@ export default class Overview {
 	 * @param colors Devices color array
 	 */
 	public static updateColors(colors: string[] | null = null): void {
+		if (!this.worker) return;
+
 		if (!colors) {
 			colors = [];
 
@@ -102,6 +112,8 @@ export default class Overview {
 	public static updateStyles(
 		styles: CSSStyleDeclaration | null = null
 	): void {
+		if (!this.worker) return;
+
 		if (!styles) {
 			styles = window.getComputedStyle(
 				document.getElementsByClassName("page")[0]
@@ -124,7 +136,16 @@ export default class Overview {
 	 * @param width Width of new viewport
 	 * @param height Height of new viewport
 	 */
-	private static updateViewport(width: number, height: number): void {
+	private static updateViewport(width?: number, height?: number): void {
+		if (!this.worker) return;
+
+		if (!width) {
+			width = this.canvas.clientWidth * devicePixelRatio;
+		}
+		if (!height) {
+			height = this.canvas.clientHeight * devicePixelRatio;
+		}
+
 		this.worker.postMessage({
 			message: "updateViewport",
 			width: width,

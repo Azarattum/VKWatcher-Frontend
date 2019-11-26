@@ -7,6 +7,11 @@ import User from "../../models/user.class";
 const ctx: Worker = self as any;
 let drawer: Drawer;
 let offscreenCanvas: OffscreenCanvas;
+let requestedRender = false;
+const render = (): void => {
+	drawer.render();
+	requestedRender = false;
+};
 
 ctx.addEventListener("message", (eventArgs: MessageEvent): void => {
 	switch (eventArgs.data.message) {
@@ -55,27 +60,33 @@ function initialize(canvas: OffscreenCanvas): void {
 function updateUser(user: User): void {
 	user = User.fromObject(user);
 	drawer.user = user;
-	drawer.render();
+	requestRender();
 }
 
 function updateZoom(factor: number): void {
 	drawer.zoom = factor;
-	drawer.render();
 }
 
 function updateColors(colors: string[]): void {
 	drawer.colors = colors;
-	drawer.render();
+	requestRender();
 }
 
 function updateViewport(width: number, height: number): void {
 	offscreenCanvas.width = width;
 	offscreenCanvas.height = height;
 	drawer.updateStyles();
-	drawer.render();
+	requestRender();
 }
 
 function updateStyles(styles: CSSStyleDeclaration): void {
 	drawer.updateStyles(styles);
-	drawer.render();
+	requestRender();
+}
+
+function requestRender(): void {
+	if (!drawer || requestedRender) return;
+
+	requestAnimationFrame(render);
+	requestedRender = true;
 }

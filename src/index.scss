@@ -7,7 +7,7 @@ body {
 
 	margin: 0;
 	overflow-x: hidden;
-	overflow-y: scroll;
+	overflow-y: auto;
 
 	font-size: 16px;
 	font-family: Arial, Helvetica, sans-serif;
@@ -167,7 +167,9 @@ body {
 }
 
 .tab-content {
-	display: none;
+	///TEMP! Implement tabs
+	// display: none;
+    width: 100vw;
 }
 
 //Feature classes
@@ -198,19 +200,21 @@ body {
 		height: 48px !important;
 	}
 
-	.head-section > .user-controlls {
-		position: absolute !important;
-		top: 2em;
-		left: 50vw !important;
-		transform: translateX(-50%);
-		margin: 0 !important;
-
+	.head-section {
 		.user-info > .name {
-			margin-bottom: 2.5em;
+			margin-bottom: 2em;
 		}
 
-		.users:hover > .dropdown {
-			height: calc(80vh - 48px) !important;
+		.user-controlls {
+			position: absolute !important;
+			top: 2em;
+			left: 50vw !important;
+			transform: translateX(-50%);
+			margin: 0 !important;
+
+			.users:hover > .dropdown {
+				height: calc(80vh - 48px) !important;
+			}
 		}
 	}
 
