@@ -26,6 +26,7 @@
     "sass": "^1.23.7",
     "sass-loader": "^8.0.0",
     "style-loader": "^1.0.0",
+    "terser-webpack-plugin": "^2.2.1",
     "ts-loader": "^6.2.1",
     "ts-shader-loader": "^1.0.6",
     "typescript": "^3.7.2",

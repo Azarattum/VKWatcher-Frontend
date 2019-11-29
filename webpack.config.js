@@ -1,5 +1,6 @@
 const Path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 
 module.exports = {
 	entry: "./src/index.ts",
@@ -72,6 +73,18 @@ module.exports = {
 					reuseExistingChunk: true
 				}
 			}
-		}
+		},
+		concatenateModules: false,
+		minimize: true,
+		minimizer: [
+			new TerserPlugin({
+				terserOptions: {
+					mangle: true,
+					sourceMap: false,
+					keep_classnames: true
+				},
+				extractComments: false
+			})
+		]
 	}
 };
