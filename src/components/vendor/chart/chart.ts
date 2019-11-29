@@ -10,16 +10,6 @@ import BarFragment from "./shaders/bar.fsh";
 import LayoutVertex from "./shaders/layout.vsh";
 import LayoutFragment from "./shaders/layout.fsh";
 
-export interface IShader {
-	fragmentSource: string;
-	vertexSource: string;
-}
-
-export interface IShaders {
-	barShader: IShader;
-	layoutShader: IShader;
-}
-
 export default class Chart {
 	public enabled: boolean = false;
 
@@ -65,9 +55,23 @@ export default class Chart {
 	/**
 	 * Refreshes chart data using current user data
 	 */
-	private refresh(): void {
+	private async refresh(): Promise<void> {
 		if (!this.data) return;
 
+		try {
+			if (this.chart.drawer) {
+				this.chart.drawer.gl.gl
+					.getExtension("WEBGL_lose_context")
+					.loseContext();
+			}
+			if (this.chart.previewer) {
+				this.chart.previewer.gl.gl
+					.getExtension("WEBGL_lose_context")
+					.loseContext();
+			}
+		} catch {
+			//Something went wrong...
+		}
 		this.container.innerHTML = "";
 		this.container.className = "";
 		this.chart._initializeComponent();

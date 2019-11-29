@@ -1,3 +1,6 @@
+//Variables
+$media-mobile: "only screen and (max-width: 640px) and (min-width: 0px) ";
+
 #chart-render {
     display: inline-block;
     width: calc(100vw - 24px);
@@ -8,4 +11,10 @@
     overflow: hidden;
     transform: translate(0, 0);
     padding-bottom: 8px;
+}
+
+@media #{$media-mobile} {
+    #chart-render {
+        margin-bottom: 0 !important;
+    }
 }

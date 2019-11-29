@@ -1,3 +1,3 @@
-import Analyser from "./analyser.int";
+import Analyser from "./analyser.class";
 
 export default class SleepAnalyser extends Analyser {}

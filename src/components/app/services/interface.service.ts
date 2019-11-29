@@ -25,7 +25,7 @@ export default class Interface extends Service<
 		if (usersContainer) {
 			for (const i in users) {
 				const user: string = users[i];
-				usersContainer.innerHTML += `<div class="button user" onclick="changeUser(${i})">${user}</div>`;
+				usersContainer.innerHTML += `<div class="button user" onclick="Interface.changeUser(${i})">${user}</div>`;
 			}
 		}
 

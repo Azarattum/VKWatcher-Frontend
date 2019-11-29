@@ -18,5 +18,10 @@ export default class Overview extends View {
 		if (visible) {
 			window.dispatchEvent(new Event("resize"));
 		}
+
+		const filters = document.querySelector(
+			".button.filters"
+		) as HTMLElement;
+		if (filters) filters.style.display = visible ? "block" : "none";
 	}
 }

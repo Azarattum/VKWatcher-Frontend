@@ -1,3 +1,6 @@
+//Variables
+$media-mobile: "only screen and (max-width: 640px) and (min-width: 0px) ";
+
 /*Generic icon class*/
 .icon {
     position: absolute;
@@ -19,6 +22,12 @@
             display: block;
         }
     }
+}
+
+@media #{$media-mobile} {
+    .icon {
+		top: 0px;
+	}
 }
 
 /*Custom icons*/
