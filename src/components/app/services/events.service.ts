@@ -4,6 +4,7 @@ import Users from "./users.service";
 import Interface from "./interface.service";
 import Overview from "../controllers/overview/overview.controller";
 import Tabs from "../../common/tabs.service";
+import Chart from "../controllers/chart/chart.controller";
 
 /**
  * One service to rule them all!
@@ -38,6 +39,11 @@ export default class Envets extends Service<"registered">() {
 			const empty = Users.selected.getFilter("empty") as {
 				enabled: boolean;
 			};
+			const name = document.querySelector(".user-info>.name");
+			const id = document.querySelector(".user-info>.id");
+
+			if (name) name.textContent = Users.selected.name;
+			if (id) id.textContent = Users.selected.id.toString();
 
 			Interface.refresh(
 				days,
@@ -46,6 +52,7 @@ export default class Envets extends Service<"registered">() {
 				!empty.enabled
 			);
 			Overview.updateUser(Users.selected);
+			Chart.updateUser(Users.selected);
 		});
 
 		//Updated Event

@@ -15,6 +15,8 @@ export default class Overview extends View {
 	public toggle(visible: boolean | null = null): void {
 		super.toggle(visible);
 
-		window.dispatchEvent(new Event("resize"));
+		if (visible) {
+			window.dispatchEvent(new Event("resize"));
+		}
 	}
 }

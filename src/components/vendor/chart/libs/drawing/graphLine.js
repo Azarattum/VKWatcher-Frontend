@@ -1,4 +1,4 @@
-import GraphDrawer from "../drawing/graph.js";
+import GraphDrawer from "./graph.js";
 import PathLine from "../data/pathLine.js";
 
 /**

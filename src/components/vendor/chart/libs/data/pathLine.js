@@ -1,4 +1,4 @@
-import Path from "../data/path.js";
+import Path from "./path.js";
 
 /**
  * This class exteds Path class to path lines.

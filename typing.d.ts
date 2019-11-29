@@ -6,6 +6,18 @@ declare module "worker-loader!*" {
 	export default WebpackWorker;
 }
 
+declare module "*.vsh" {
+	const string: string;
+
+	export default string;
+}
+
+declare module "*.fsh" {
+	const string: string;
+
+	export default string;
+}
+
 declare module "*.pug" {
 	const value: (locals?: {}) => string;
 	export default value;

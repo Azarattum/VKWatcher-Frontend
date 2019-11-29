@@ -1,7 +1,14 @@
-import ChartElement from "./scripts/element/element";
+/**Styles */
+import "./styles/base.scss";
+/**Classes */
+import ChartElement from "./libs/element/element";
 import DateUtils from "../../common/date.class";
-import Loader from "../../common/loader.class";
 import User from "../../app/models/user.class";
+/**Shaders */
+import BarVertex from "./shaders/bar.vsh";
+import BarFragment from "./shaders/bar.fsh";
+import LayoutVertex from "./shaders/layout.vsh";
+import LayoutFragment from "./shaders/layout.fsh";
 
 export interface IShader {
 	fragmentSource: string;
@@ -17,20 +24,27 @@ export default class Chart {
 	public enabled: boolean = false;
 
 	private container: HTMLElement;
-	private chart: ChartElement | null = null;
+	private chart: ChartElement;
 	private data: IChartData | null = null;
-	private delayedExecution: Function[] = [];
 
 	public constructor(container: HTMLElement) {
 		this.container = container;
-		const shaderLoader = new Loader([
-			"./libs/shaders/bar.vsh",
-			"./libs/shaders/bar.fsh",
-			"./libs/shaders/layout.vsh",
-			"./libs/shaders/layout.fsh"
-		]);
 
-		shaderLoader.load().then(this.initialize);
+		const pageStyle = getComputedStyle(document.body);
+		const shaders = {
+			bar: [BarVertex, BarFragment],
+			layout: [LayoutVertex, LayoutFragment]
+		};
+
+		this.chart = new ChartElement(this.container, shaders);
+		this.chart.style = {
+			background: "255, 255, 255",
+			text: pageStyle.getPropertyValue("--color-text"),
+			font: pageStyle.fontFamily,
+			lowlight: 0.05
+		};
+
+		this.registerEvents();
 	}
 
 	//#region Public methods
@@ -51,18 +65,16 @@ export default class Chart {
 	/**
 	 * Refreshes chart data using current user data
 	 */
-	public refresh(): void {
-		if (!this.chart) {
-			this.delayedExecution.push(this.refresh);
-			return;
-		}
-		if (!this.data || !this.chart.drawer) return;
+	private refresh(): void {
+		if (!this.data) return;
 
 		this.container.innerHTML = "";
+		this.container.className = "";
 		this.chart._initializeComponent();
 		this.chart._initializeStyle();
 		this.chart.chart = this.data;
 
+		if (!this.chart.drawer) return;
 		//Custom format style
 		const func = this.chart.drawer.onrecalculated;
 		this.chart.drawer.onrecalculated = (): void => {
@@ -98,10 +110,7 @@ export default class Chart {
 	 * Updates element (for example on resize)
 	 */
 	public update(): void {
-		if (!this.chart) {
-			this.delayedExecution.push(this.update);
-			return;
-		}
+		if (!this.chart.drawer) return;
 
 		this.chart.style = {};
 		this.chart.update();
@@ -115,28 +124,6 @@ export default class Chart {
 	//#endregion
 
 	//#region Private methods
-	/**
-	 * Intialize the chart
-	 * @param shadersData Shaders source
-	 */
-	private initialize(shadersData: any[]): void {
-		const pageStyle = getComputedStyle(document.body);
-		const shaders = {
-			bar: [shadersData[0], shadersData[1]],
-			layout: [shadersData[2], shadersData[3]]
-		};
-
-		this.chart = new ChartElement(this.container, shaders);
-		this.chart.style = {
-			background: "255, 255, 255",
-			text: pageStyle.getPropertyValue("--color-text"),
-			font: pageStyle.fontFamily,
-			lowlight: 0.05
-		};
-
-		this.registerEvents();
-	}
-
 	/**
 	 * Converts user object to chart-library-compatable input object
 	 * @param {User} user User object to extract data from
@@ -228,14 +215,10 @@ export default class Chart {
 	 * Renders the chart
 	 */
 	private render(): void {
-		if (this.enabled || !this.chart || !this.chart.chartData) {
-			requestAnimationFrame(() => {
-				this.render();
-			});
-			return;
+		if (this.enabled && this.chart && this.chart.chartData) {
+			this.chart.render();
 		}
 
-		this.chart.render();
 		requestAnimationFrame(() => {
 			this.render();
 		});

@@ -1,7 +1,7 @@
 import {Color} from "../core/utils.js";
 import Chart from "../data/chart.js";
 import ChartDrawer from "../drawing/chart.js";
-import ChartController from "../element/controller.js";
+import ChartController from "./controller.js";
 
 export const ANIMATION_PERIOD = 200;
 

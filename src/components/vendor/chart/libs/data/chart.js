@@ -1,5 +1,5 @@
 import {Point, Color} from "../core/utils.js";
-import Graph from "../data/graph.js";
+import Graph from "./graph.js";
 
 /**
  * This class represents a chart.

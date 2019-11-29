@@ -8,6 +8,7 @@ import Hash from "../common/hash.service";
 import Interface from "./services/interface.service";
 import Events from "./services/events.service";
 import Overview from "./controllers/overview/overview.controller";
+import Chart from "./controllers/chart/chart.controller";
 import Tabs from "../common/tabs.service";
 /**Views */
 import OverviewView from "./views/overview/overview.view";
@@ -27,7 +28,15 @@ export default class App {
 	 * Note that the page should be already loaded
 	 */
 	public async initialize(): Promise<void> {
-		const components = [Users, Interface, Overview, Events, Tabs, Hash];
+		const components = [
+			Users,
+			Interface,
+			Overview,
+			Chart,
+			Events,
+			Tabs,
+			Hash
+		];
 
 		const views = [
 			new IconsView(),
@@ -72,6 +81,7 @@ export default class App {
 		return [
 			[data],
 			[Object.values(data).map(x => x.name)],
+			[],
 			[],
 			[],
 			[
