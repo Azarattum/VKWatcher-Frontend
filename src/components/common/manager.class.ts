@@ -99,7 +99,9 @@ export default class Manager {
 	 */
 	public getComponent(name: string): IComponent | null {
 		return (
-			this.components.find(component => component.name == name) || null
+			this.components.find(
+				component => component.name.toLowerCase() == name.toLowerCase()
+			) || null
 		);
 	}
 
@@ -108,7 +110,11 @@ export default class Manager {
 	 * @param name Component's name
 	 */
 	public getView(name: string): View | null {
-		return this.views.find(view => view.name == name) || null;
+		return (
+			this.views.find(
+				view => view.name.toLowerCase() == name.toLowerCase()
+			) || null
+		);
 	}
 }
 

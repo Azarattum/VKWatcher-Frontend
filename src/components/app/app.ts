@@ -1,18 +1,20 @@
 /**Utils */
 import Loader from "../common/loader.class";
 import Manager from "../common/manager.class";
+import DateUtils from "../common/date.class";
 /**Services */
 import Users, { IUsersData } from "./services/users.service";
 import Hash from "../common/hash.service";
 import Interface from "./services/interface.service";
 import Events from "./services/events.service";
 import Overview from "./controllers/overview/overview.controller";
+import Tabs from "../common/tabs.service";
 /**Views */
 import OverviewView from "./views/overview/overview.view";
 import FiltersView from "./views/filters/filters.view";
 import ChartView from "./views/chart/chart.view";
 import AnalysisView from "./views/analysis/analysis.view";
-import DateUtils from "../common/date.class";
+import IconsView from "./views/icons/icons.view";
 
 /**
  * Main application class
@@ -25,7 +27,31 @@ export default class App {
 	 * Note that the page should be already loaded
 	 */
 	public async initialize(): Promise<void> {
-		//Prepare data
+		const components = [Users, Interface, Overview, Events, Tabs, Hash];
+
+		const views = [
+			new IconsView(),
+			new FiltersView(),
+			new OverviewView(),
+			new ChartView(),
+			new AnalysisView()
+		];
+
+		this.manger = new Manager(components, views);
+
+		const args = await this.initializeArguments();
+
+		await this.manger.initialize(args);
+	}
+
+	/**
+	 * Initializes arguments for the manager
+	 */
+	private async initializeArguments(): Promise<any[][]> {
+		if (!this.manger) {
+			throw new Error("Initialize manager first!");
+		}
+
 		const loader = new Loader(["/assets/sessions.json"]);
 		const data = (await loader.load())[0] as IUsersData;
 		const days = DateUtils.getDaysBetween(
@@ -43,11 +69,18 @@ export default class App {
 			) * 1000
 		);
 
-		const args = [
+		return [
 			[data],
 			[Object.values(data).map(x => x.name)],
 			[],
 			[],
+			[
+				[
+					this.manger.getView("Overview"),
+					this.manger.getView("Chart"),
+					this.manger.getView("Analysis")
+				]
+			],
 			[
 				{
 					user: 0,
@@ -59,17 +92,5 @@ export default class App {
 				}
 			]
 		];
-
-		const components = [Users, Interface, Overview, Events, Hash];
-
-		const views = [
-			new FiltersView(),
-			new OverviewView(),
-			new ChartView(),
-			new AnalysisView()
-		];
-
-		this.manger = new Manager(components, views);
-		await this.manger.initialize(args);
 	}
 }

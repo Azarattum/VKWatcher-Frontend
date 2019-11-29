@@ -3,6 +3,7 @@ import Hash from "../../common/hash.service";
 import Users from "./users.service";
 import Interface from "./interface.service";
 import Overview from "../controllers/overview/overview.controller";
+import Tabs from "../../common/tabs.service";
 
 /**
  * One service to rule them all!
@@ -15,6 +16,7 @@ export default class Envets extends Service<"registered">() {
 		this.registerUsers();
 		this.registerInterface();
 		this.registerHash();
+		this.registerTabs();
 
 		this.call("registered");
 	}
@@ -142,8 +144,27 @@ export default class Envets extends Service<"registered">() {
 				const zoom = +(properties["zoom"] || 1);
 
 				Interface.refresh(days, period, device, empty, zoom);
+				Tabs.change(properties["tab"]);
 				Hash.freeze(false);
 			}
 		);
+	}
+
+	/**
+	 * Register Tabs service events
+	 */
+	private static registerTabs(): void {
+		Tabs.addEventListener("tabchanged", (name: string) => {
+			//Setup icon
+			const icons = document.getElementsByClassName("icon");
+			for (const icon of icons) {
+				icon.classList.remove("filled");
+			}
+			const icon = document.querySelector(".icon." + name.toLowerCase());
+			if (icon) icon.classList.add("filled");
+
+			//Save to hash
+			Hash.set("tab", name.toLowerCase());
+		});
 	}
 }

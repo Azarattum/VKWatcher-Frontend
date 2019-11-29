@@ -11,25 +11,25 @@ html(lang="en")
             .head-section
                 .user-info
                     .name Loading...
-                    .id(onclick="openProfile(event)")
+                    .id(onclick="Interface.openProfile(event)")
                 .user-controlls
                     .button.filters &#x2699;&#xFE0E;                        
                         .dropdown(view="filters")
                     .button.users &#9776;
                         .dropdown
                             div#users
-                    .button.previous(onclick="changeUser(-1,true)") &#9668;
-                    .button.next(onclick="changeUser(1,true)") &#9658;
+                    .button.previous(onclick="Interface.changeUser(-1,true)") &#9668;
+                    .button.next(onclick="Interface.changeUser(1,true)") &#9658;
             //- Main section
             .content-secton
                 //- Tab buttons
                 .tab-control
-                    .tab 
+                    .tab(onclick="Tabs.change('Overview')")
                         .icon.overview
-                    .tab
+                    .tab(onclick="Tabs.change('Chart')")
                         .icon.chart
                             i
-                    .tab
+                    .tab(onclick="Tabs.change('Analysis')")
                         .icon.analysis
 
                 .tab-content.overview(view="overview")

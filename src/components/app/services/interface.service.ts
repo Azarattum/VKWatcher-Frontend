@@ -55,28 +55,28 @@ export default class Interface extends Service<
 			}
 		});
 
-		//Interface functions
-		(window as any).changeUser = (id: number, relative: boolean): void => {
+		//Interface global functions
+		this.expose("changeUser", (id: number, relative: boolean): void => {
 			this.call("userchanged", id, relative, true);
-		};
+		});
 
-		(window as any).changeEmpty = (event: MouseEvent): void => {
+		this.expose("changeEmpty", (event: MouseEvent): void => {
 			this.call(
 				"emptychanged",
 				(event.target as HTMLInputElement).checked,
 				true
 			);
-		};
+		});
 
-		(window as any).changeDevice = (id: number): void => {
+		this.expose("changeDevice", (id: number): void => {
 			this.call("devicechanged", id, true);
-		};
+		});
 
-		(window as any).openProfile = (event: MouseEvent): void => {
+		this.expose("openProfile", (event: MouseEvent): void => {
 			const id = (event.target as HTMLElement).textContent;
 			const newWindow = window.open("https://vk.com/id" + id, "_blank");
 			if (newWindow) newWindow.focus();
-		};
+		});
 	}
 
 	public static refresh(

@@ -1,10 +1,10 @@
 span.label Filters:
 .filters
     label.empty-container Empty
-        input(type="checkbox" checked="true" onclick="changeEmpty(event)")#empty
+        input(type="checkbox" checked="true" onclick="Interface.changeEmpty(event)")#empty
         span.empty-checkmark
 
-    select.device(onchange="changeDevice(+this.value)")#device
+    select.device(onchange="Interface.changeDevice(+this.value)")#device
         option(value="-1").none No Device Filter
         option(value="0" style="background-color:var(--color-unknown)") Unknown
         option(value="1" style="background-color:var(--color-mobile)") Mobile

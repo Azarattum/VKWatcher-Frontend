@@ -41,17 +41,35 @@ export default abstract class View {
 		}
 		if (!template) return;
 
+		this.container.innerHTML = template(args);
+		this.template = null;
+	}
+
+	public toggle(visible: boolean | null = null): void {
+		if (visible == null) {
+			if (this.container.style.display == "none") {
+				visible = true;
+			} else {
+				visible = false;
+			}
+		}
+
+		if (visible) {
+			this.container.style.display = "block";
+		} else {
+			this.container.style.display = "none";
+		}
+	}
+
+	private get container(): HTMLElement {
 		const container = document.querySelector(
 			`[view=${this.name.toLowerCase()}]`
 		);
 
-		if (container) {
-			container.innerHTML = template(args);
-			this.template = null;
-		} else {
-			throw new Error(
-				`Failed to render ${this.name} view. Container not found!`
-			);
+		if (!container) {
+			throw new Error(`Container ${this.name} not found!`);
 		}
+
+		return container as HTMLElement;
 	}
 }

@@ -31,6 +31,33 @@ export default function Service<T extends string>() {
 				this.callbacks[type].map(x => x.call(x, ...args));
 			}
 		}
+
+		/**
+		 * Exposes function to be used in global window scope.
+		 * Either a custom function can be provided or a method
+		 * of current service class (the names must match)
+		 * @param name Name of the exposed function (in the scope of service)
+		 * @param func Exposed function
+		 */
+		protected static expose(
+			name: string,
+			func: Function | null = null
+		): void {
+			if (!(window as any)[this.name]) {
+				(window as any)[this.name] = {};
+			}
+
+			if (func) {
+				(window as any)[this.name][name] = func;
+			} else {
+				if (typeof (this as any)[name] != "function") {
+					throw new Error("The function to expose not found!");
+				}
+				(window as any)[this.name][name] = (...args: any[]) => {
+					((this as any)[name] as Function).call(this, ...args);
+				};
+			}
+		}
 	}
 
 	//Return service with specific typings
