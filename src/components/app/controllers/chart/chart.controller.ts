@@ -42,9 +42,12 @@ export default class Chart {
 		if (enabled == null) enabled = !this.chart.enabled;
 
 		this.chart.enabled = enabled;
-		if (enabled && this.user) {
-			this.chart.switch(this.user);
-			this.user = null;
+		if (enabled) {
+			this.chart.update();
+			if (this.user) {
+				this.chart.switch(this.user);
+				this.user = null;
+			}
 		}
 	}
 }
