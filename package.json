@@ -1,9 +1,9 @@
 {
   "scripts": {
     "serve": "node --max-old-space-size=4096 node_modules/.bin/webpack-dev-server",
-    "build": "node_modules/.bin/webpack-cli -d",
-    "watch": "node_modules/.bin/webpack-cli -d -w",
-    "release": "node_modules/.bin/webpack-cli -p"
+    "release": "node_modules/.bin/webpack-cli -p --progress",
+    "build": "node_modules/.bin/webpack-cli -d --progress",
+    "watch": "node_modules/.bin/webpack-cli -d -w"
   },
   "dependencies": {},
   "devDependencies": {
@@ -31,6 +31,7 @@
     "ts-shader-loader": "^1.0.6",
     "typescript": "^3.7.2",
     "webpack": "^4.41.2",
+    "webpack-cleanup-plugin": "^0.5.1",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.9.0",
     "worker-loader": "^2.0.0"
