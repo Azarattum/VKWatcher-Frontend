@@ -16,6 +16,7 @@ export default class Chart {
 	private container: HTMLElement;
 	private chart: ChartElement;
 	private data: IChartData | null = null;
+	private backgroundlyResized: boolean = false;
 
 	public constructor(container: HTMLElement) {
 		this.container = container;
@@ -220,6 +221,10 @@ export default class Chart {
 	 */
 	private render(): void {
 		if (this.enabled && this.chart && this.chart.chartData) {
+			if (this.backgroundlyResized) {
+				this.update();
+				this.backgroundlyResized = false;
+			}
 			this.chart.render();
 		}
 
@@ -233,27 +238,29 @@ export default class Chart {
 	 */
 	private registerEvents(): void {
 		//Save old sizes
-		let width: number | null = null;
-		let height: number | null = null;
+		let width: number = window.innerWidth;
+		let height: number = window.innerHeight;
 
 		window.addEventListener("resize", () => {
 			//Check if size has changed
-			const newSize = this.container.getClientRects()[0];
-
 			if (
 				!this.chart ||
 				!this.chart.chartData ||
-				newSize == undefined ||
-				(newSize.width == width && newSize.height == height)
+				(window.innerWidth == width && window.innerHeight == height)
 			) {
-				width = newSize ? newSize.width : null;
-				height = newSize ? newSize.height : null;
 				return;
 			}
 
-			width = newSize.width;
-			height = newSize.height;
-			this.update();
+			width = window.innerWidth;
+			height = window.innerHeight;
+
+			const containerSize = this.container.getClientRects()[0];
+
+			if (containerSize) {
+				this.update();
+			} else if (!this.enabled) {
+				this.backgroundlyResized = true;
+			}
 		});
 		requestAnimationFrame(() => {
 			this.render();
