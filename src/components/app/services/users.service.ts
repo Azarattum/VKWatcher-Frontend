@@ -35,7 +35,7 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 
 		if (this.data[id]) {
 			this.id = id;
-			this.call("userchanged");
+			this.call("userchanged", this.selected);
 		}
 	}
 

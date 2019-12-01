@@ -5,6 +5,8 @@ import Interface from "./interface.service";
 import Overview from "../controllers/overview/overview.controller";
 import Tabs from "../../common/tabs.service";
 import Chart from "../controllers/chart/chart.controller";
+import Analysis from "../controllers/analysis/analysis.controller";
+import User from "../models/user.class";
 
 /**
  * One service to rule them all!
@@ -27,32 +29,37 @@ export default class Envets extends Service<"registered">() {
 	 */
 	private static registerUsers(): void {
 		//Changed Event
-		Users.addEventListener("userchanged", () => {
-			const days = Object.keys(Users.selected.days).map(x => +x);
-			const period = (Users.selected.getFilter("period") as unknown) as {
+		Users.addEventListener("userchanged", (user: User) => {
+			//Get user's data
+			const days = Object.keys(user.days).map(x => +x);
+			const period = (user.getFilter("period") as unknown) as {
 				from: number;
 				to: number;
 			};
-			const device = (Users.selected.getFilter("device") as unknown) as {
+			const device = (user.getFilter("device") as unknown) as {
 				platform: number;
 			};
-			const empty = Users.selected.getFilter("empty") as {
+			const empty = user.getFilter("empty") as {
 				enabled: boolean;
 			};
 			const name = document.querySelector(".user-info>.name");
 			const id = document.querySelector(".user-info>.id");
 
-			if (name) name.textContent = Users.selected.name;
-			if (id) id.textContent = Users.selected.id.toString();
+			//Update DOM
+			if (name) name.textContent = user.name;
+			if (id) id.textContent = user.id.toString();
 
+			//Update services
 			Interface.refresh(
 				days,
 				period,
 				device.platform || -1,
 				!empty.enabled
 			);
-			Overview.updateUser(Users.selected);
-			Chart.updateUser(Users.selected);
+
+			Overview.updateUser(user);
+			Chart.updateUser(user);
+			Analysis.updateUser(user);
 		});
 
 		//Updated Event

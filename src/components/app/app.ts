@@ -9,6 +9,7 @@ import Interface from "./services/interface.service";
 import Events from "./services/events.service";
 import Overview from "./controllers/overview/overview.controller";
 import Chart from "./controllers/chart/chart.controller";
+import Analysis from "./controllers/analysis/analysis.controller";
 import Tabs from "../common/tabs.service";
 /**Views */
 import OverviewView from "./views/overview/overview.view";
@@ -33,6 +34,7 @@ export default class App {
 			Interface,
 			Overview,
 			Chart,
+			Analysis,
 			Events,
 			Tabs,
 			Hash
@@ -56,7 +58,9 @@ export default class App {
 	/**
 	 * Initializes arguments for the manager
 	 */
-	private async initializeArguments(): Promise<any[][]> {
+	private async initializeArguments(): Promise<{
+		[component: string]: any[];
+	}> {
 		if (!this.manger) {
 			throw new Error("Initialize manager first!");
 		}
@@ -78,20 +82,17 @@ export default class App {
 			) * 1000
 		);
 
-		return [
-			[data],
-			[Object.values(data).map(x => x.name)],
-			[],
-			[],
-			[],
-			[
+		return {
+			Users: [data],
+			Interface: [Object.values(data).map(x => x.name)],
+			Tabs: [
 				[
 					this.manger.getView("Overview"),
 					this.manger.getView("Chart"),
 					this.manger.getView("Analysis")
 				]
 			],
-			[
+			Hash: [
 				{
 					user: 0,
 					zoom: 1,
@@ -101,6 +102,6 @@ export default class App {
 					tab: "overview"
 				}
 			]
-		];
+		};
 	}
 }

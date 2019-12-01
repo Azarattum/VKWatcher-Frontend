@@ -25,8 +25,8 @@ export default class Manager {
 	 * Initializes all components
 	 */
 	public async initialize(
-		componentArgs: any[][] = [],
-		viewArgs: {}[] = []
+		componentArgs: any[][] | { [component: string]: any[] } = [],
+		viewArgs: {}[] | { [view: string]: {} } = []
 	): Promise<void> {
 		let exceptions = 0;
 		if (this.logging) Utils.log("Initializtion started...");
@@ -35,8 +35,12 @@ export default class Manager {
 		for (const i in this.views) {
 			const view = this.views[i];
 			try {
-				if (viewArgs[i]) {
-					await view.render(null, viewArgs[i]);
+				const args = Array.isArray(viewArgs)
+					? viewArgs[i]
+					: viewArgs[view.name];
+
+				if (args) {
+					await view.render(null, args);
 				} else {
 					await view.render();
 				}
@@ -60,8 +64,12 @@ export default class Manager {
 		for (const i in this.components) {
 			const component = this.components[i];
 			try {
-				if (componentArgs[i]) {
-					await component.initialize(...componentArgs[i]);
+				const args = Array.isArray(componentArgs)
+					? componentArgs[i]
+					: componentArgs[component.name];
+
+				if (args) {
+					await component.initialize(...args);
 				} else {
 					await component.initialize();
 				}
