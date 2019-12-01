@@ -107,18 +107,14 @@ export default class PeriodAnalyzer implements IAnalyzer {
 				j++;
 			}
 
-			if (!result[j]) result[j] = [];
+			if (!result[j]) (result[j] as any) = [];
 
-			(result[j] as number[]).push(results[i]);
+			(result[j] as any).push(results[i]);
 		}
 
 		//Normalize
 		for (const i in result) {
-			result[i] =
-				result[i][0] +
-				(result[i].length == 1
-					? ""
-					: " " + result[i][result[i].length - 1]);
+			result[i] = result[i][0] + " " + result[i][result[i].length - 1];
 		}
 
 		result.format = "period";

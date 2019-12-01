@@ -84,6 +84,7 @@ export default class App {
 
 		return {
 			Users: [data],
+			Analysis: [data],
 			Interface: [Object.values(data).map(x => x.name)],
 			Tabs: [
 				[

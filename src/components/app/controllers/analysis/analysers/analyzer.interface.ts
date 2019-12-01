@@ -13,10 +13,10 @@ export default interface IAnalyzer {
  * General interface for data results of analyzers
  */
 export interface IResult {
-	[top: number]: string | number[];
+	[top: number]: string;
 	min?: number;
 	max?: number;
 	avg?: number;
 
-	format?: "time" | "period";
+	format?: "time" | "period" | "user";
 }
