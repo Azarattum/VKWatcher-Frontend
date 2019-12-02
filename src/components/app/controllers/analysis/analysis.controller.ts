@@ -8,6 +8,7 @@ export default class Analysis {
 	private static container: HTMLElement | null = null;
 	private static worker: Worker | null = null;
 	private static user: User | null;
+	private static box: HTMLElement | null = null;
 	private static names: { [id: string]: string } = {};
 
 	/**
@@ -49,7 +50,25 @@ export default class Analysis {
 
 		if (this.worker) {
 			this.worker.postMessage({ user: this.user.toObject() });
+
+			if (this.container) {
+				this.container.innerHTML = "";
+				this.container.appendChild(this.createBox());
+			}
 		}
+	}
+
+	private static createBox(): HTMLElement {
+		const box = document.createElement("div");
+		box.classList.add("analysis-box");
+		const title = document.createElement("div");
+		title.classList.add("title");
+		title.innerText = "Analyzing...";
+
+		box.appendChild(title);
+		this.box = box;
+
+		return box;
 	}
 
 	private static renderResult(
@@ -58,9 +77,41 @@ export default class Analysis {
 		done: boolean
 	): void {
 		if (!this.container) return;
+		if (!this.box) this.container.appendChild(this.createBox());
+		if (!this.box) return;
 
-		///Append to html in the future
-		console.log(description + ":\n\t", this.formatResult(result), done);
+		//Set the box title
+		const title = this.box.firstChild as HTMLElement;
+		title.innerText = description;
+		const formattedResult = this.formatResult(result);
+
+		//Append all results
+		for (const i in formattedResult) {
+			const content = formattedResult[i];
+			const div = document.createElement("div");
+			div.classList.add("content");
+			if (+i == 0) {
+				div.classList.add("top");
+			} else if (+i == formattedResult.length - 1) {
+				div.classList.add("bottom");
+			}
+
+			div.innerText = content;
+			if (result.format == "user") {
+				const userNumber = Object.keys(this.names).indexOf(result[i]);
+				div.style.cursor = "pointer";
+				div.style.textDecoration = "underline";
+				div.onclick = () => {
+					(window as any).Interface.changeUser(userNumber, false);
+				};
+			}
+			this.box.appendChild(div);
+		}
+
+		//Create next box if not done
+		if (!done) {
+			this.container.appendChild(this.createBox());
+		}
 	}
 
 	private static formatResult(result: IResult): string[] {
