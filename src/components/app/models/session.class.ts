@@ -23,7 +23,7 @@ export default class Session {
 		//Perform the convertions for futher procession
 		if (from instanceof Date) from = Math.round(+from / 1000);
 		if (to instanceof Date) to = Math.round(+to / 1000);
-		if (from >= to) from = to - 15;
+		if (from >= to) to = from + 5;
 
 		//#region Fields
 		this.from = new Date(from * 1000);
