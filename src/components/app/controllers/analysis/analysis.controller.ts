@@ -101,7 +101,7 @@ export default class Analysis {
 				const userNumber = Object.keys(this.names).indexOf(result[i]);
 				div.style.cursor = "pointer";
 				div.style.textDecoration = "underline";
-				div.onclick = () => {
+				div.onclick = (): void => {
 					(window as any).Interface.changeUser(userNumber, false);
 				};
 			}

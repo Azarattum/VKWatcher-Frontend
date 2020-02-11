@@ -17,6 +17,7 @@ import FiltersView from "./views/filters/filters.view";
 import ChartView from "./views/chart/chart.view";
 import AnalysisView from "./views/analysis/analysis.view";
 import IconsView from "./views/icons/icons.view";
+import Fetcher from "./services/fetcher.service";
 
 /**
  * Main application class
@@ -30,6 +31,7 @@ export default class App {
 	 */
 	public async initialize(): Promise<void> {
 		const components = [
+			Fetcher,
 			Users,
 			Interface,
 			Overview,
@@ -83,6 +85,7 @@ export default class App {
 		);
 
 		return {
+			Fetcher: [""],
 			Users: [data],
 			Analysis: [data],
 			Interface: [Object.values(data).map(x => x.name)],

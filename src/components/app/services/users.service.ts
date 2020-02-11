@@ -26,8 +26,8 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 
 			//Save user to an array
 			this.data.push(user);
-			this.call("dataupdated");
 		}
+		this.call("dataupdated");
 	}
 
 	public static select(id: number, relative: boolean = false): void {

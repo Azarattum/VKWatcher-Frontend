@@ -7,6 +7,12 @@ import Tabs from "../../common/tabs.service";
 import Chart from "../controllers/chart/chart.controller";
 import Analysis from "../controllers/analysis/analysis.controller";
 import User from "../models/user.class";
+import Fetcher, {
+	IUserDays,
+	IUserName,
+	IUserSessions,
+	ISessionMap
+} from "./fetcher.service";
 
 /**
  * One service to rule them all!
@@ -16,6 +22,7 @@ import User from "../models/user.class";
 export default class Envets extends Service<"registered">() {
 	public static async initialize(): Promise<void> {
 		//Register service events
+		this.registerFetcher();
 		this.registerUsers();
 		this.registerInterface();
 		this.registerHash();
@@ -140,6 +147,7 @@ export default class Envets extends Service<"registered">() {
 			"loaded",
 			(properties: { [name: string]: string }) => {
 				Hash.freeze();
+				///REIMPLEMENT!
 				Users.select(+(properties["user"] || 0));
 
 				const days = Object.keys(Users.selected.days).map(x => +x);
@@ -179,6 +187,32 @@ export default class Envets extends Service<"registered">() {
 
 			//Save to hash
 			Hash.set("tab", name.toLowerCase());
+		});
+	}
+
+	/**
+	 * Register Fetcher service events
+	 */
+	private static registerFetcher(): void {
+		Fetcher.addEventListener("gotdays", (days: IUserDays[]) => {
+			console.log(days);
+		});
+
+		Fetcher.addEventListener("gotnames", (names: IUserName[]) => {
+			//Init all
+			const userId = +(Hash.get("user") || 0);
+			Fetcher.selectUser(userId);
+			//Users.select(+(properties["user"] || 0));
+
+			console.log(names);
+		});
+
+		Fetcher.addEventListener("gotsessions", (sessions: IUserSessions) => {
+			console.log(sessions);
+		});
+
+		Fetcher.addEventListener("gotmap", (map: ISessionMap) => {
+			console.log(map);
 		});
 	}
 }
