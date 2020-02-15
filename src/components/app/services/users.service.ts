@@ -1,11 +1,16 @@
 import User from "../models/user.class";
 import Service from "../../common/service.abstract";
+import { IUserSessions, IUserName } from "./fetcher.service";
+import Session from "../models/session.class";
+import EmptyFilter from "../models/filters/empty.class";
+import DeviceFilter from "../models/filters/device.class";
+import PeriodFilter from "../models/filters/period.class";
 
 /**
  * Service for managing users
  */
 export default class Users extends Service<"dataupdated" | "userchanged">() {
-	public static data: User[] = [];
+	private static data: User[] = [];
 	private static id: number = 0;
 
 	public static get selectedId(): number {
@@ -16,18 +21,72 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 		return this.data[this.id];
 	}
 
-	public static initialize(data: IUsersData): void {
-		//Iterate through all users in data
-		for (const id in data) {
-			const userData = data[id];
-			(userData as any).id = id;
+	/**
+	 * Returns whether the user is selected
+	 * @param id User full id
+	 */
+	public static isSelected(id: string): boolean {
+		return this.selectedId == this.data.findIndex(x => x.id == id);
+	}
 
-			const user = User.fromObject(userData);
+	/**
+	 * Sets users' names
+	 * @param names Users' names
+	 */
+	public static setNames(names: IUserName[]): void {
+		for (const name of names) {
+			this.addUser(name.id);
 
-			//Save user to an array
-			this.data.push(user);
+			const user = this.data.find(x => x.id == name.id);
+			if (user) {
+				user.name = name.name;
+			}
 		}
-		this.call("dataupdated");
+	}
+
+	/**
+	 * Adds user's sessions
+	 * @param sessions User's sessions object
+	 */
+	public static addSessions(sessions: IUserSessions): void {
+		this.addUser(sessions.id);
+
+		const user = this.data.find(x => x.id == sessions.id);
+		if (user) {
+			const firstSessions = !user.firstDay;
+			for (const session of sessions.sessions) {
+				user.addSession(
+					new Session(session.from, session.to, session.platform)
+				);
+			}
+
+			if (firstSessions) {
+				const period = new PeriodFilter("period");
+				period.from = user.firstDay;
+				period.to = user.lastDay;
+				user.addFilter(period);
+			}
+		}
+
+		this.call("dataupdated", user == this.selected);
+	}
+
+	public static addUser(id: string): void {
+		if (this.data.some(x => x.id == id)) return;
+
+		const user = new User(id);
+		this.data.push(user);
+
+		//Add filters
+		const empty = new EmptyFilter("empty");
+		const device = new DeviceFilter("device");
+
+		//Setup filters
+		empty.toggle(false);
+
+		//Register filters
+		user.addFilter(empty);
+		user.addFilter(device);
 	}
 
 	public static select(id: number, relative: boolean = false): void {
@@ -46,7 +105,7 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 			(filter as any)[param[0]] = param[1];
 		}
 
-		this.call("dataupdated");
+		this.call("dataupdated", true, false);
 	}
 }
 

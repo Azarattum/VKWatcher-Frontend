@@ -13,7 +13,8 @@ export default class User {
 	/**Username (first + last names).*/
 	public name: string;
 	/**User id.*/
-	public id: number;
+	public id: string;
+	/**User days.*/
 	public days: { [day: number]: Day } = {};
 
 	private filters: IFilter[] = [];
@@ -23,11 +24,26 @@ export default class User {
 	 * @param {String} name User's display name
 	 * @param {Number} id User's vk id
 	 */
-	public constructor(name: string, id: number) {
+	public constructor(id: string, name: string = "") {
 		//#region Fields
 		this.id = id;
 		this.name = name;
 		//#endregion
+	}
+
+	/**
+	 * Number of user's first day
+	 */
+	public get firstDay(): number {
+		return +Object.keys(this.days)[0];
+	}
+
+	/**
+	 * Number of user's last day
+	 */
+	public get lastDay(): number {
+		const days = Object.keys(this.days);
+		return +days[days.length - 1];
 	}
 
 	/**
@@ -50,12 +66,10 @@ export default class User {
 	 * @param {Boolean} applyFilters Should filters be applied
 	 */
 	public getDaysEnumenator(applyFilters: boolean = true): () => Day | null {
-		const days = Object.keys(this.days);
-		const maxDay = +days[days.length - 1];
-		let currentDay = +days[0];
+		let currentDay = this.firstDay;
 
 		return (): Day | null => {
-			if (currentDay > maxDay) {
+			if (currentDay > this.lastDay) {
 				return null;
 			} else {
 				//Find the next day using filters
@@ -171,7 +185,7 @@ export default class User {
 	 */
 	public static fromObject(object: any): User {
 		//Create user object
-		const user = new User(object.name, +object.id);
+		const user = new User(object.id, object.name);
 
 		//Add sessions
 		if (object.sessions) {
@@ -208,10 +222,9 @@ export default class User {
 			const period = new PeriodFilter("period");
 
 			//Setup filters
-			const days = Object.keys(user.days);
 			empty.toggle(false);
-			period.from = +days[0];
-			period.to = +days[days.length - 1];
+			period.from = user.firstDay;
+			period.to = user.lastDay;
 
 			//Register filters
 			user.addFilter(empty);

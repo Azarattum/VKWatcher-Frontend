@@ -17,7 +17,7 @@ export default class Fetcher extends Service<
 	 * Initializes the fetcher service
 	 * @param url API Url
 	 */
-	public static async initialize(url: string): Promise<void> {
+	public static initialize(url: string): void {
 		this.url = url;
 
 		//Initial data calls
@@ -30,11 +30,6 @@ export default class Fetcher extends Service<
 			this.activeRequests--;
 
 			setTimeout(this.backgroundLoad.bind(this), this.requestInterval);
-		});
-		this.activeRequests++;
-		this.fetchDays().then((days: IUserDays[]) => {
-			this.call("gotdays", days);
-			this.activeRequests--;
 		});
 	}
 
@@ -52,14 +47,20 @@ export default class Fetcher extends Service<
 			this.loadStatuses[userId] = LoadStatus.Loaded;
 		}
 
-		//Get the rest
-		if (this.loadStatuses[userId] != LoadStatus.Full) {
-			const sessions = await this.fetchSessions(userId, true);
-			this.call("gotsessions", sessions);
-			this.loadStatuses[userId] = LoadStatus.Full;
-		}
+		setTimeout(
+			(async (): Promise<void> => {
+				//Get the rest
+				if (this.loadStatuses[userId] != LoadStatus.Full) {
+					const sessions = await this.fetchSessions(userId, true);
+					this.call("gotsessions", sessions);
+					this.loadStatuses[userId] = LoadStatus.Full;
+				}
+				this.activeRequests--;
+			}).bind(this),
+			this.requestInterval
+		);
 
-		this.activeRequests -= 2;
+		this.activeRequests--;
 	}
 
 	/**

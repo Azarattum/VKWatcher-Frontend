@@ -68,9 +68,9 @@ export default class Manager {
 					? componentArgs[i]
 					: componentArgs[component.name];
 
-				if (args) {
+				if (args && component.initialize) {
 					await component.initialize(...args);
-				} else {
+				} else if (component.initialize) {
 					await component.initialize();
 				}
 				if (this.logging) {
@@ -134,5 +134,5 @@ export interface IComponent {
 	name: string;
 
 	/**Initializable entry */
-	initialize(...args: any[]): void;
+	initialize?(...args: any[]): void;
 }

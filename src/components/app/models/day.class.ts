@@ -29,7 +29,14 @@ export default class Day {
 				this.addSession(oneSession);
 			}
 		} else {
-			this.sessions.push(session);
+			//Push only unique sessions
+			if (
+				!this.sessions.some(
+					x => x.from == session.from && x.to == session.to
+				)
+			) {
+				this.sessions.push(session);
+			}
 		}
 	}
 

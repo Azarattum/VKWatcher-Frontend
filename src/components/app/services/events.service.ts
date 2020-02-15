@@ -8,7 +8,6 @@ import Chart from "../controllers/chart/chart.controller";
 import Analysis from "../controllers/analysis/analysis.controller";
 import User from "../models/user.class";
 import Fetcher, {
-	IUserDays,
 	IUserName,
 	IUserSessions,
 	ISessionMap
@@ -38,7 +37,6 @@ export default class Envets extends Service<"registered">() {
 		//Changed Event
 		Users.addEventListener("userchanged", (user: User) => {
 			//Get user's data
-			const days = Object.keys(user.days).map(x => +x);
 			const period = (user.getFilter("period") as unknown) as {
 				from: number;
 				to: number;
@@ -56,23 +54,33 @@ export default class Envets extends Service<"registered">() {
 			if (name) name.textContent = user.name;
 			if (id) id.textContent = user.id.toString();
 
-			//Update services
-			Interface.refresh(
-				days,
-				period,
-				device.platform || -1,
-				!empty.enabled
-			);
+			//Update interface
+			Interface.setEmpty(!empty.enabled);
+			Interface.setPlatform(device.platform || -1);
+			Interface.setRange({ from: user.firstDay, to: user.lastDay });
+			if (period) {
+				Interface.setPeriod(period);
+			}
 
+			//Update data
 			Overview.updateUser(user);
 			Chart.updateUser(user);
 			Analysis.updateUser(user);
 		});
 
 		//Updated Event
-		Users.addEventListener("dataupdated", () => {
-			Overview.updateUser();
-		});
+		Users.addEventListener(
+			"dataupdated",
+			(isSelected: boolean, full: boolean = true) => {
+				if (isSelected) {
+					Overview.updateUser();
+					if (full) {
+						Chart.updateUser(Users.selected);
+						Analysis.updateUser(Users.selected);
+					}
+				}
+			}
+		);
 	}
 
 	/**
@@ -82,7 +90,8 @@ export default class Envets extends Service<"registered">() {
 		//User Changed Event
 		Interface.addEventListener(
 			"userchanged",
-			(id: number, relative?: boolean) => {
+			async (id: number, relative?: boolean) => {
+				await Fetcher.selectUser(relative ? id + Users.selectedId : id);
 				Users.select(id, relative);
 				Hash.set("user", Users.selectedId);
 			}
@@ -91,12 +100,11 @@ export default class Envets extends Service<"registered">() {
 		//Period Changed Event
 		Interface.addEventListener(
 			"periodchanged",
-			(from: number, to: number, offset: number, update: boolean) => {
+			(from: number, to: number) => {
 				Hash.set("period", from + "-" + to);
-				if (!update) return;
 				Users.updateFilter("period", {
-					from: from + offset - 1,
-					to: to + offset - 1
+					from: from,
+					to: to
 				});
 			}
 		);
@@ -114,28 +122,20 @@ export default class Envets extends Service<"registered">() {
 		});
 
 		//Device Changed Event
-		Interface.addEventListener(
-			"devicechanged",
-			(id: number, update: boolean) => {
-				Hash.set("device", id);
-				if (!update) return;
-				Users.updateFilter("device", {
-					platform: id
-				});
-			}
-		);
+		Interface.addEventListener("devicechanged", (id: number) => {
+			Hash.set("device", id);
+			Users.updateFilter("device", {
+				platform: id
+			});
+		});
 
 		//Empty Toggled Event
-		Interface.addEventListener(
-			"emptychanged",
-			(value: boolean, update: boolean) => {
-				Hash.set("empty", value);
-				if (!update) return;
-				Users.updateFilter("empty", {
-					enabled: !value
-				});
-			}
-		);
+		Interface.addEventListener("emptychanged", (value: boolean) => {
+			Hash.set("empty", value);
+			Users.updateFilter("empty", {
+				enabled: !value
+			});
+		});
 	}
 
 	/**
@@ -146,28 +146,7 @@ export default class Envets extends Service<"registered">() {
 		Hash.addEventListener(
 			"loaded",
 			(properties: { [name: string]: string }) => {
-				Hash.freeze();
-				///REIMPLEMENT!
-				Users.select(+(properties["user"] || 0));
-
-				const days = Object.keys(Users.selected.days).map(x => +x);
-				const period = {
-					from:
-						+(properties["period"] || "1-1").split("-")[0] +
-						days[0] -
-						1,
-					to:
-						+(properties["period"] || "1-1").split("-")[1] +
-						days[0] -
-						1
-				};
-				const device = +(properties["device"] || -1);
-				const empty = properties["empty"] == "true";
-				const zoom = +(properties["zoom"] || 1);
-
-				Interface.refresh(days, period, device, empty, zoom);
 				Tabs.change(properties["tab"]);
-				Hash.freeze(false);
 			}
 		);
 	}
@@ -194,25 +173,63 @@ export default class Envets extends Service<"registered">() {
 	 * Register Fetcher service events
 	 */
 	private static registerFetcher(): void {
-		Fetcher.addEventListener("gotdays", (days: IUserDays[]) => {
-			console.log(days);
-		});
-
-		Fetcher.addEventListener("gotnames", (names: IUserName[]) => {
+		Fetcher.addEventListener("gotnames", async (names: IUserName[]) => {
 			//Init all
 			const userId = +(Hash.get("user") || 0);
-			Fetcher.selectUser(userId);
-			//Users.select(+(properties["user"] || 0));
+			const zoom = +(Hash.get("zoom") || 1);
+			const device = +(Hash.get("device") || -1);
+			const empty = Hash.get("empty") == "true";
+			const period = Hash.get("period")?.split("-");
 
-			console.log(names);
+			Users.setNames(names);
+			Analysis.setNames(names);
+
+			await Fetcher.selectUser(userId);
+			Hash.freeze(true);
+			Users.select(userId);
+			Hash.freeze(false);
+
+			Interface.setNames(names.map(x => x.name));
+			Interface.setZoom(zoom);
+			Interface.setPlatform(device);
+			Interface.setEmpty(empty);
+			if (period) {
+				Interface.setPeriod({
+					from: +period[0],
+					to: +period[1]
+				});
+			}
+
+			//Reveal element
+			setTimeout(() => {
+				document
+					.getElementById("overview-render")
+					?.style.setProperty("opacity", "1");
+				setTimeout(() => {
+					document
+						.getElementById("overview-render")
+						?.style.setProperty("transition", "none");
+				}, 300);
+			}, 100);
 		});
 
 		Fetcher.addEventListener("gotsessions", (sessions: IUserSessions) => {
-			console.log(sessions);
+			if (!sessions.sessions) return;
+
+			Users.addSessions(sessions);
+
+			if (Users.isSelected(sessions.id)) {
+				//Update range because of new sessions
+				Interface.setRange({
+					from: Users.selected.firstDay,
+					to: Users.selected.lastDay
+				});
+			}
 		});
 
 		Fetcher.addEventListener("gotmap", (map: ISessionMap) => {
-			console.log(map);
+			Analysis.setMap(map);
+			Analysis.updateUser(Users.selected);
 		});
 	}
 }

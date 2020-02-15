@@ -1,20 +1,20 @@
 import Worker from "worker-loader!./analysis.worker";
 import User from "../../models/user.class";
 import { IResult } from "./analysers/analyzer.interface";
-import { IUsersData } from "../../services/users.service";
 import DateUtils from "../../../common/date.class";
+import { ISessionMap, IUserName } from "../../services/fetcher.service";
 
 export default class Analysis {
 	private static container: HTMLElement | null = null;
 	private static worker: Worker | null = null;
 	private static user: User | null;
 	private static box: HTMLElement | null = null;
-	private static names: { [id: string]: string } = {};
+	private static names: IUserName[];
 
 	/**
 	 * Initializes analysis controller
 	 */
-	public static initialize(users: IUsersData): void {
+	public static initialize(): void {
 		const container = document.getElementById("analysis-render");
 		if (!container) {
 			throw new Error("Container for analysis render not found!");
@@ -22,9 +22,10 @@ export default class Analysis {
 		this.container = container;
 
 		this.worker = new Worker();
-		this.worker.postMessage({
+		///REMOVE
+		/*this.worker.postMessage({
 			users: users
-		});
+		});*/
 		this.worker.addEventListener("message", (eventArgs: MessageEvent) => {
 			this.renderResult(
 				eventArgs.data.result,
@@ -33,15 +34,28 @@ export default class Analysis {
 			);
 		});
 
-		for (const id in users) {
-			this.names[id] = users[id].name;
-		}
-
 		this.updateUser();
 	}
 
 	/**
-	 *
+	 * Sets users' names to enable propper formating
+	 * @param names Users' names
+	 */
+	public static setNames(names: IUserName[]): void {
+		this.names = names;
+	}
+
+	/**
+	 * Sets density map to activate dependent analyzers
+	 * @param map Users' sessions density map
+	 */
+	public static setMap(map: ISessionMap): void {
+		///IMPLEMENT
+		//Send map to the worker, then it enables similarity heruistics
+	}
+
+	/**
+	 * Starts analyse of a given user
 	 * @param user New user to analyse
 	 */
 	public static updateUser(user: User | null = null): void {
@@ -98,7 +112,7 @@ export default class Analysis {
 
 			div.innerText = content;
 			if (result.format == "user") {
-				const userNumber = Object.keys(this.names).indexOf(result[i]);
+				const userNumber = this.names.findIndex(x => x.id == result[i]);
 				div.style.cursor = "pointer";
 				div.style.textDecoration = "underline";
 				div.onclick = (): void => {
@@ -128,7 +142,7 @@ export default class Analysis {
 					format += DateUtils.getReadableDuration(+value);
 					break;
 				case "user":
-					format += this.names[value];
+					format += this.names.find(x => x.id == value)?.name;
 					break;
 				case "period": {
 					const parts = value.split(" ");

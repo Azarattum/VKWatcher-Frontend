@@ -81,7 +81,10 @@ export default class Session {
 		let from = new Date(+this.from);
 		let to = new Date(+this.from);
 		to = DateUtils.normalizeDateDown(to);
-		sessions.push(new Session(from, to, this.platform));
+		let session = new Session(from, to, this.platform);
+		if (!session.isOverNight()) {
+			sessions.push(session);
+		}
 
 		const fullDays = DateUtils.getDaysBetween(this.from, this.to) - 1;
 		for (let i = 0; i < fullDays; i++) {
@@ -92,7 +95,10 @@ export default class Session {
 			from = DateUtils.normalizeDateUp(from);
 			to = DateUtils.normalizeDateDown(to);
 			//Create a full day session
-			sessions.push(new Session(from, to, this.platform));
+			session = new Session(from, to, this.platform);
+			if (!session.isOverNight()) {
+				sessions.push(session);
+			}
 		}
 
 		//Create a last day session
@@ -100,7 +106,10 @@ export default class Session {
 		to = new Date(+this.to);
 		from = DateUtils.normalizeDateUp(from);
 		if (+from != +to) {
-			sessions.push(new Session(from, to, this.platform));
+			session = new Session(from, to, this.platform);
+			if (!session.isOverNight()) {
+				sessions.push(session);
+			}
 		}
 
 		return sessions;

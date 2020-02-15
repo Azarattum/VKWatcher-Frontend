@@ -1,9 +1,7 @@
 /**Utils */
-import Loader from "../common/loader.class";
 import Manager from "../common/manager.class";
-import DateUtils from "../common/date.class";
 /**Services */
-import Users, { IUsersData } from "./services/users.service";
+import Users from "./services/users.service";
 import Hash from "../common/hash.service";
 import Interface from "./services/interface.service";
 import Events from "./services/events.service";
@@ -67,28 +65,8 @@ export default class App {
 			throw new Error("Initialize manager first!");
 		}
 
-		const loader = new Loader(["/assets/sessions.json"]);
-		const data = (await loader.load())[0] as IUsersData;
-		const days = DateUtils.getDaysBetween(
-			Math.min.apply(
-				null,
-				Object.values(data)
-					[+(Hash.get("user") || 0)].sessions.map(x => x.from)
-					.filter(x => Number.isFinite(x))
-			) * 1000,
-			Math.max.apply(
-				null,
-				Object.values(data)
-					[+(Hash.get("user") || 0)].sessions.map(x => x.to)
-					.filter(x => Number.isFinite(x))
-			) * 1000
-		);
-
 		return {
 			Fetcher: [""],
-			Users: [data],
-			Analysis: [data],
-			Interface: [Object.values(data).map(x => x.name)],
 			Tabs: [
 				[
 					this.manger.getView("Overview"),
@@ -100,7 +78,6 @@ export default class App {
 				{
 					user: 0,
 					zoom: 1,
-					period: "1-" + (days + 1),
 					device: -1,
 					empty: true,
 					tab: "overview"

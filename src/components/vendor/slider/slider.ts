@@ -4,7 +4,7 @@ import "./styles/base.scss";
 import "./styles/overwrite.scss";
 
 export default class Slider {
-	private element: any;
+	public element: any;
 
 	public constructor(
 		container: HTMLElement | null,
