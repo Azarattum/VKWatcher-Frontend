@@ -8,7 +8,6 @@ export default class Analysis {
 	private static container: HTMLElement | null = null;
 	private static worker: Worker | null = null;
 	private static user: User | null;
-	private static box: HTMLElement | null = null;
 	private static names: IUserName[];
 
 	/**
@@ -66,21 +65,23 @@ export default class Analysis {
 			this.worker.postMessage({ user: this.user.toObject() });
 
 			if (this.container) {
-				this.container.innerHTML = "";
-				this.container.appendChild(this.createBox());
+				const boxes = document.querySelectorAll("[box-type]");
+				if (boxes.length == 0) {
+					this.container.appendChild(this.createBox());
+				}
 			}
 		}
 	}
 
-	private static createBox(): HTMLElement {
+	private static createBox(type: string = "Loading"): HTMLElement {
 		const box = document.createElement("div");
 		box.classList.add("analysis-box");
+		box.setAttribute("box-type", type);
 		const title = document.createElement("div");
 		title.classList.add("title");
 		title.innerText = "Analyzing...";
 
 		box.appendChild(title);
-		this.box = box;
 
 		return box;
 	}
@@ -91,14 +92,30 @@ export default class Analysis {
 		done: boolean
 	): void {
 		if (!this.container) return;
-		if (!this.box) this.container.appendChild(this.createBox());
-		if (!this.box) return;
+		let box = document.querySelector(`[box-type='${description}']`);
+		if (!box) {
+			box = document.querySelector(`[box-type='Loading']`);
+			if (box) {
+				box.setAttribute("box-type", description);
+			}
+		}
+		if (!box) {
+			box = this.createBox(description);
+			this.container.appendChild(box);
+		}
 
 		//Set the box title
-		const title = this.box.firstChild as HTMLElement;
+		const title = box.firstChild as HTMLElement;
 		title.innerText = description;
 		const formattedResult = this.formatResult(result);
 
+		//Clear previous results
+		const items = box.getElementsByClassName("content");
+		const length = items.length;
+		for (let i = 0; i < length; i++) {
+			const item = items.item(0);
+			if (item) item.remove();
+		}
 		//Append all results
 		for (const i in formattedResult) {
 			const content = formattedResult[i];
@@ -119,12 +136,7 @@ export default class Analysis {
 					(window as any).Interface.changeUser(userNumber, false);
 				};
 			}
-			this.box.appendChild(div);
-		}
-
-		//Create next box if not done
-		if (!done) {
-			this.container.appendChild(this.createBox());
+			box.appendChild(div);
 		}
 	}
 
