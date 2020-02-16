@@ -34,9 +34,11 @@ export default class Envets extends Service<"registered">() {
 	 * Register Users service events
 	 */
 	private static registerUsers(): void {
+		let userChanging = false;
 		//Changed Event
-		Users.addEventListener("userchanged", (user: User) => {
+		Users.addEventListener("userchanged", async (user: User) => {
 			//Get user's data
+			userChanging = true;
 			const period = (user.getFilter("period") as unknown) as {
 				from: number;
 				to: number;
@@ -54,25 +56,28 @@ export default class Envets extends Service<"registered">() {
 			if (name) name.textContent = user.name;
 			if (id) id.textContent = user.id.toString();
 
-			//Update interface
-			Interface.setEmpty(!empty.enabled);
-			Interface.setPlatform(device.platform || -1);
-			Interface.setRange({ from: user.firstDay, to: user.lastDay });
-			if (period) {
-				Interface.setPeriod(period);
-			}
-
 			//Update data
 			Overview.updateUser(user);
-			Chart.updateUser(user);
-			Analysis.updateUser(user);
+
+			//Update interface
+			setTimeout(() => {
+				Chart.updateUser(user);
+				Analysis.updateUser(user);
+				Interface.setEmpty(!empty.enabled);
+				Interface.setPlatform(device.platform || -1);
+				Interface.setRange({ from: user.firstDay, to: user.lastDay });
+				if (period) {
+					Interface.setPeriod(period);
+				}
+				userChanging = false;
+			}, 100);
 		});
 
 		//Updated Event
 		Users.addEventListener(
 			"dataupdated",
 			(isSelected: boolean, full: boolean = true) => {
-				if (isSelected) {
+				if (isSelected && !userChanging) {
 					Overview.updateUser();
 					if (full) {
 						Chart.updateUser(Users.selected);
@@ -173,6 +178,7 @@ export default class Envets extends Service<"registered">() {
 	 * Register Fetcher service events
 	 */
 	private static registerFetcher(): void {
+		let initialCall = true;
 		Fetcher.addEventListener("gotnames", async (names: IUserName[]) => {
 			//Init all
 			const userId = +(Hash.get("user") || 0);
@@ -184,6 +190,12 @@ export default class Envets extends Service<"registered">() {
 			Users.setNames(names);
 			Analysis.setNames(names);
 
+			//No need for auto select, if user is alredy selected
+			if (!initialCall) {
+				Interface.setNames(names.map(x => x.name));
+				return;
+			}
+			initialCall = false;
 			await Fetcher.selectUser(userId);
 			Hash.freeze(true);
 			Users.select(userId);

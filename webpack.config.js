@@ -1,7 +1,11 @@
+/* eslint-disable @typescript-eslint/camelcase */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable no-undef */
 const Path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const WebpackCleanupPlugin = require("webpack-cleanup-plugin");
+const WorkboxPlugin = require("workbox-webpack-plugin");
 
 const prod = process.argv.indexOf("-p") !== -1;
 
@@ -13,6 +17,7 @@ module.exports = {
 		new HtmlWebpackPlugin({
 			template: "./src/index.pug"
 		}),
+		prod ? new WorkboxPlugin.GenerateSW() : () => {},
 		prod ? new WebpackCleanupPlugin() : () => {}
 	],
 	module: {

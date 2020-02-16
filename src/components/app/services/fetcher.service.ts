@@ -17,97 +17,148 @@ export default class Fetcher extends Service<
 	 * Initializes the fetcher service
 	 * @param url API Url
 	 */
-	public static initialize(url: string): void {
+	public static async initialize(url: string): Promise<void> {
 		this.url = url;
 
-		//Initial data calls
+		//Load names
 		this.activeRequests++;
-		this.fetchNames().then((names: IUserName[]) => {
-			this.ids = names.map(x => x.id);
-			this.loadStatuses = names.map(() => LoadStatus.None);
+		const names = await this.fetchNames();
+		if (!names) {
+			throw new Error("Unable to load names!");
+		}
+		this.activeRequests--;
 
-			this.call("gotnames", names);
-			this.activeRequests--;
-
-			setTimeout(this.backgroundLoad.bind(this), this.requestInterval);
-		});
+		//Start background loading
+		setTimeout(this.backgroundLoad.bind(this), this.requestInterval);
 	}
 
 	/**
 	 * Triggers fetches on user selection
 	 */
 	public static async selectUser(userId: number): Promise<void> {
-		this.activeRequests += 2;
-
 		//Get last 30 days
 		if (this.loadStatuses[userId] == LoadStatus.None) {
+			this.activeRequests++;
 			this.loadStatuses[userId] = LoadStatus.Requested;
-			const sessions = await this.fetchSessions(userId);
-			this.call("gotsessions", sessions);
-			this.loadStatuses[userId] = LoadStatus.Loaded;
+			if (await this.fetchSessions(userId)) {
+				this.loadStatuses[userId] = LoadStatus.Loaded;
+			}
+			this.activeRequests--;
 		}
 
+		//Get the rest
 		setTimeout(
 			(async (): Promise<void> => {
-				//Get the rest
 				if (this.loadStatuses[userId] != LoadStatus.Full) {
-					const sessions = await this.fetchSessions(userId, true);
-					this.call("gotsessions", sessions);
-					this.loadStatuses[userId] = LoadStatus.Full;
+					this.activeRequests++;
+					if (await this.fetchSessions(userId, true)) {
+						this.loadStatuses[userId] = LoadStatus.Full;
+					}
+					this.activeRequests--;
 				}
-				this.activeRequests--;
 			}).bind(this),
 			this.requestInterval
 		);
-
-		this.activeRequests--;
 	}
 
 	/**
-	 * Fetches users' sessions from API
+	 * Fetches users' sessions from API and emits the events
 	 */
 	private static async fetchSessions(
 		userId: number,
 		all: boolean = false
-	): Promise<IUserSessions> {
+	): Promise<IUserSessions | null> {
+		let result: IUserSessions | null = null;
 		const id = this.ids[userId];
 
-		const sessions = await fetch(
+		const networkPromise = fetch(
 			`${this.url}/api/sessions/get/${id}/${all ? "30" : "0/30"}`
 		);
-		return (await sessions.json()) as IUserSessions;
+
+		const cachedResponse = await caches.match(
+			`${id}/${all ? "all" : "30"}`
+		);
+
+		if (cachedResponse) {
+			result = await cachedResponse.json();
+			await this.call("gotsessions", result);
+		}
+
+		try {
+			const networkResponse = await networkPromise;
+			const cache = await caches.open("api-cache");
+			cache.put(`${id}/${all ? "all" : "30"}`, networkResponse.clone());
+			result = await networkResponse.json();
+			await this.call("gotsessions", result);
+		} catch {
+			//Network error
+		}
+
+		return result;
 	}
 
 	/**
-	 * Fetches users' names from API
+	 * Fetches users' names from API and emits the events
 	 */
-	private static async fetchNames(): Promise<IUserName[]> {
-		const names = await fetch(this.url + "/api/users/name/all");
-		return (await names.json()) as IUserName[];
+	private static async fetchNames(): Promise<IUserName[] | null> {
+		let result: IUserName[] | null = null;
+		const networkPromise = fetch(this.url + "/api/users/name/all");
+		const cachedResponse = await caches.match("names");
+
+		if (cachedResponse) {
+			result = (await cachedResponse.json()) as IUserName[];
+			this.ids = result.map((x: { id: string }) => x.id);
+			this.loadStatuses = result.map(() => LoadStatus.None);
+			await this.call("gotnames", result);
+		}
+
+		try {
+			const networkResponse = await networkPromise;
+			const cache = await caches.open("api-cache");
+			cache.put("names", networkResponse.clone());
+
+			result = (await networkResponse.json()) as IUserName[];
+			this.ids = result.map((x: { id: string }) => x.id);
+			this.loadStatuses = result.map(() => LoadStatus.None);
+			await this.call("gotnames", result);
+		} catch {
+			//Network error
+		}
+
+		return result;
 	}
 
 	/**
 	 * Fetches users' days from API
 	 */
-	private static async fetchDays(): Promise<IUserDays[]> {
-		const days = await fetch(this.url + "/api/users/days/all");
-		return (await days.json()) as IUserDays[];
-	}
+	private static async fetchMap(): Promise<ISessionMap | null> {
+		let result: ISessionMap | null = null;
+		const networkPromise = fetch(this.url + "/api/sessions/map");
+		const cachedResponse = await caches.match("map");
 
-	/**
-	 * Fetches users' days from API
-	 */
-	private static async fetchMap(): Promise<ISessionMap> {
-		const map = await fetch(this.url + "/api/sessions/map");
-		return (await map.json()) as ISessionMap;
+		if (cachedResponse) {
+			result = await cachedResponse.json();
+			await this.call("gotmap", result);
+		}
+
+		try {
+			const networkResponse = await networkPromise;
+			const cache = await caches.open("api-cache");
+			cache.put("map", networkResponse.clone());
+			result = await networkResponse.json();
+			await this.call("gotmap", result);
+		} catch {
+			//Network error
+		}
+
+		return result;
 	}
 
 	private static async backgroundLoad(iteration: number): Promise<void> {
 		//Starting with density map
 		if (iteration == null) {
 			this.activeRequests++;
-			this.fetchMap().then((map: ISessionMap) => {
-				this.call("gotmap", map);
+			this.fetchMap().then(() => {
 				this.activeRequests--;
 			});
 
@@ -143,11 +194,12 @@ export default class Fetcher extends Service<
 			//Fetch sessions
 			this.activeRequests++;
 			this.loadStatuses[iteration] = LoadStatus.Requested;
-			this.fetchSessions(iteration).then((sessions: IUserSessions) => {
-				this.call("gotsessions", sessions);
-				this.loadStatuses[iteration] = LoadStatus.Loaded;
-				this.activeRequests--;
-			});
+			this.fetchSessions(iteration).then(
+				(sessions: IUserSessions | null) => {
+					this.loadStatuses[iteration] = LoadStatus.Loaded;
+					this.activeRequests--;
+				}
+			);
 
 			setTimeout(() => {
 				this.backgroundLoad(iteration + 1);

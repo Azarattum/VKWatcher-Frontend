@@ -22,19 +22,15 @@ export default class Day {
 	 * Adds a new session to the day
 	 * @param {Session} session New session
 	 */
-	public addSession(session: Session | Session[]): void {
+	public addSession(session: Session | Session[], check = true): void {
 		if (session instanceof Array) {
 			//Recursively adds an array
 			for (const oneSession of session) {
-				this.addSession(oneSession);
+				this.addSession(oneSession, check);
 			}
 		} else {
 			//Push only unique sessions
-			if (
-				!this.sessions.some(
-					x => x.from == session.from && x.to == session.to
-				)
-			) {
+			if (!check || !this.sessions.find(x => +x.from == +session.from)) {
 				this.sessions.push(session);
 			}
 		}
@@ -87,7 +83,7 @@ export default class Day {
 			return filter.passSession(x);
 		});
 		//Add filtered session to a new day
-		day.addSession(sessions);
+		day.addSession(sessions, false);
 		return day;
 	}
 

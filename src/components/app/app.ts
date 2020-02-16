@@ -16,6 +16,7 @@ import ChartView from "./views/chart/chart.view";
 import AnalysisView from "./views/analysis/analysis.view";
 import IconsView from "./views/icons/icons.view";
 import Fetcher from "./services/fetcher.service";
+import Offline from "./services/offline.service";
 
 /**
  * Main application class
@@ -29,13 +30,14 @@ export default class App {
 	 */
 	public async initialize(): Promise<void> {
 		const components = [
-			Fetcher,
+			Offline,
 			Users,
 			Interface,
 			Overview,
 			Chart,
 			Analysis,
 			Events,
+			Fetcher,
 			Tabs,
 			Hash
 		];

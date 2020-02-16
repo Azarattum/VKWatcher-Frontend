@@ -11,7 +11,7 @@ import PeriodFilter from "../models/filters/period.class";
  */
 export default class Users extends Service<"dataupdated" | "userchanged">() {
 	private static data: User[] = [];
-	private static id: number = 0;
+	private static id: number = -1;
 
 	public static get selectedId(): number {
 		return this.id;
