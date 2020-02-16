@@ -62,9 +62,14 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 
 			if (firstSessions) {
 				const period = new PeriodFilter("period");
-				period.from = user.firstDay;
+				period.from = user.firstDay + 1;
 				period.to = user.lastDay;
 				user.addFilter(period);
+			} else if (sessions.sessions.length == 0) {
+				const filter = user.getFilter("period") as PeriodFilter;
+				if (filter.from == user.firstDay + 1) {
+					filter.from = user.firstDay;
+				}
 			}
 		}
 

@@ -30,7 +30,7 @@ export default class Interface extends Service<
 				prettify: (value: number): string => {
 					let date = DateUtils.getDateFromGlobalDay(value).toString();
 					date = date.split(" ")[1] + " " + date.split(" ")[2];
-					return date;
+					return isNaN(value) ? "" : date;
 				},
 				onChange: (data): void => {
 					this.call("periodchanged", data.from, data.to);
