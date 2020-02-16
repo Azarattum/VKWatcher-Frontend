@@ -2,10 +2,13 @@
 Front end web application for processing data from VKWatcher-Backend
 
 ## Features:
+  - Collect the data from your backend API
   - View all your data in an intuitive table format
   - Apply filters to the collected data
   - Build a graph based on your data
+  - Run analyzers on your data
   - Compatible with mobile devices
+  - Offline-first architecture
   - And more...
 
 ### Usage:
