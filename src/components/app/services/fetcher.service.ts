@@ -69,6 +69,7 @@ export default class Fetcher extends Service<
 		all: boolean = false
 	): Promise<IUserSessions | null> {
 		let result: IUserSessions | null = null;
+		let check: number | undefined;
 		const id = this.ids[userId];
 
 		const networkPromise = fetch(
@@ -81,6 +82,7 @@ export default class Fetcher extends Service<
 
 		if (cachedResponse) {
 			result = await cachedResponse.json();
+			check = result?.sessions.length;
 			await this.call("gotsessions", result);
 		}
 
@@ -89,7 +91,9 @@ export default class Fetcher extends Service<
 			const cache = await caches.open("api-cache");
 			cache.put(`${id}/${all ? "all" : "30"}`, networkResponse.clone());
 			result = await networkResponse.json();
-			await this.call("gotsessions", result);
+			if (result?.sessions.length != check) {
+				await this.call("gotsessions", result);
+			}
 		} catch {
 			//Network error
 		}
@@ -102,6 +106,7 @@ export default class Fetcher extends Service<
 	 */
 	private static async fetchNames(): Promise<IUserName[] | null> {
 		let result: IUserName[] | null = null;
+		let check: number | undefined;
 		const networkPromise = fetch(this.url + "/api/users/name/all");
 		const cachedResponse = await caches.match("names");
 
@@ -109,6 +114,7 @@ export default class Fetcher extends Service<
 			result = (await cachedResponse.json()) as IUserName[];
 			this.ids = result.map((x: { id: string }) => x.id);
 			this.loadStatuses = result.map(() => LoadStatus.None);
+			check = result.length;
 			await this.call("gotnames", result);
 		}
 
@@ -120,7 +126,9 @@ export default class Fetcher extends Service<
 			result = (await networkResponse.json()) as IUserName[];
 			this.ids = result.map((x: { id: string }) => x.id);
 			this.loadStatuses = result.map(() => LoadStatus.None);
-			await this.call("gotnames", result);
+			if (result.length != check) {
+				await this.call("gotnames", result);
+			}
 		} catch {
 			//Network error
 		}
@@ -137,7 +145,7 @@ export default class Fetcher extends Service<
 		const cachedResponse = await caches.match("map");
 
 		if (cachedResponse) {
-			result = await cachedResponse.json();
+			result = (await cachedResponse.json()) as ISessionMap;
 			await this.call("gotmap", result);
 		}
 
