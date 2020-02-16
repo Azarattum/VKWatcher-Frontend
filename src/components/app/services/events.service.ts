@@ -222,7 +222,7 @@ export default class Envets extends Service<"registered">() {
 						.getElementById("overview-render")
 						?.style.setProperty("transition", "none");
 				}, 300);
-			}, 100);
+			}, 200);
 		});
 
 		Fetcher.addEventListener("gotsessions", (sessions: IUserSessions) => {
