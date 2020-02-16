@@ -96,10 +96,13 @@ export default class Envets extends Service<"registered">() {
 		Interface.addEventListener(
 			"userchanged",
 			async (id: number, relative?: boolean) => {
-				Analysis.clear();
-				await Fetcher.selectUser(relative ? id + Users.selectedId : id);
-				Users.select(id, relative);
-				Hash.set("user", Users.selectedId);
+				const userId = relative ? id + Users.selectedId : id;
+				if (userId >= 0 && userId < Users.count) {
+					Analysis.clear();
+					Hash.set("user", userId);
+					await Fetcher.selectUser(userId);
+					Users.select(userId);
+				}
 			}
 		);
 

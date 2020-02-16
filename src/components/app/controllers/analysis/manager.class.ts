@@ -11,6 +11,7 @@ export default class AnalyzersManager {
 		done: boolean
 	) => void;
 	private analyzers: IAnalyzer[];
+	private analysisId = 0;
 
 	/**
 	 * Creates manager for analyzers
@@ -36,17 +37,24 @@ export default class AnalyzersManager {
 	 * @param user User to analyze
 	 */
 	public async analyze(user: User): Promise<void> {
+		this.analysisId++;
+		const currentId = this.analysisId;
 		let analyzed = 0;
 
 		for (const analyzer of this.analyzers) {
-			analyzer.analyze(user).then((result: IResult) => {
-				analyzed++;
-				this.callback(
-					result,
-					analyzer.description,
-					analyzed >= this.analyzers.length
-				);
-			});
+			if (currentId != this.analysisId) return;
+			setTimeout(() => {
+				analyzer.analyze(user).then((result: IResult) => {
+					analyzed++;
+					if (currentId == this.analysisId) {
+						this.callback(
+							result,
+							analyzer.description,
+							analyzed >= this.analyzers.length
+						);
+					}
+				});
+			}, 50);
 		}
 	}
 }

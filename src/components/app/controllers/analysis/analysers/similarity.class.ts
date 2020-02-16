@@ -16,36 +16,75 @@ export default class SimilarityAnalyzer implements IAnalyzer {
 		this.densityMap = densityMap;
 	}
 
+	private proximity(item1: number, item2: number): number {
+		return 1 - 1 / (1 + Math.exp(-Math.abs(item1 - item2)));
+	}
+
+	private pcos(user1: string, user2: string): number {
+		const ratings1 = this.densityMap[user1];
+		const ratings2 = this.densityMap[user2];
+
+		let product = 0;
+		let magnitude1 = 0;
+		let magnitude2 = 0;
+		let amount1 = 0;
+		let amount2 = 0;
+		let count1 = 0;
+		let count2 = 0;
+		for (const item in ratings1) {
+			const rate1 = ratings1[item];
+			const rate2 = ratings2[item];
+			if (Number.isInteger(rate1)) {
+				amount1 += rate1;
+				count1++;
+			}
+			if (Number.isInteger(rate2)) {
+				amount2 += rate2;
+				count2++;
+			}
+			if (!Number.isInteger(rate1) || !Number.isInteger(rate2)) {
+				continue;
+			}
+
+			product += rate1 * rate2;
+			magnitude1 += rate1 * rate1;
+			magnitude2 += rate2 * rate2;
+		}
+
+		return (
+			(Math.abs(product) /
+				(Math.sqrt(magnitude1) * Math.sqrt(magnitude2))) *
+			this.proximity(amount1 / count1, amount2 / count2)
+		);
+	}
+
 	public async analyze(user: User): Promise<IResult> {
 		const scores: { [id: string]: number } = {};
-		const map = this.densityMap[user.id];
-		if (Object.keys(map).length <= 0) return [];
+		if (Object.keys(this.densityMap[user.id]).length <= 0) return [];
 
 		for (const id in this.densityMap) {
-			const otherMap = this.densityMap[id];
-			scores[id] = 0;
-			//Ignore self and null users
-			if (user.id == id || Object.keys(otherMap).length <= 0) {
-				scores[id] = this.isSimilar ? Infinity : -Infinity;
+			//Ignore self and empty users
+			if (user.id == id || Object.keys(this.densityMap[id]).length == 0) {
+				scores[id] = this.isSimilar ? -Infinity : Infinity;
 				continue;
 			}
 
 			//Count score difference
-			for (const i in map) {
-				if (map[i] && otherMap[i]) {
-					scores[id] += Math.pow(map[i] - otherMap[i], 2);
-				}
-			}
+			scores[id] = this.pcos(user.id, id);
 		}
 
-		const min = Object.values(scores)
+		const result: IResult = Object.entries(scores)
 			.sort((a, b) =>
-				a > b ? (this.isSimilar ? 1 : -1) : this.isSimilar ? -1 : 1
+				a[1] < b[1]
+					? this.isSimilar
+						? 1
+						: -1
+					: this.isSimilar
+					? -1
+					: 1
 			)
-			.slice(0, 3);
-		const result: IResult = min.map(x =>
-			Object.keys(scores).find(y => scores[+y] == x)
-		) as IResult;
+			.slice(0, 3)
+			.map(x => x[0]);
 
 		result.format = "user";
 

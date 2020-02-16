@@ -102,6 +102,7 @@ export default class Analysis {
 	): void {
 		if (!this.container) return;
 		let box = document.querySelector(`[box-type='${description}']`);
+		const boxExists = !!box;
 		if (!box) {
 			box = document.querySelector(`[box-type='Loading']`);
 			if (box) {
@@ -146,6 +147,17 @@ export default class Analysis {
 				};
 			}
 			box.appendChild(div);
+		}
+
+		if (!done && !boxExists) {
+			this.container.appendChild(this.createBox());
+		} else {
+			const items = document.querySelectorAll(`[box-type='Loading']`);
+			const length = items.length;
+			for (let i = 0; i < length; i++) {
+				const item = items.item(0);
+				if (item) item.remove();
+			}
 		}
 	}
 

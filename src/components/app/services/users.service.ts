@@ -21,6 +21,10 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 		return this.data[this.id];
 	}
 
+	public static get count(): number {
+		return this.data.length;
+	}
+
 	/**
 	 * Returns whether the user is selected
 	 * @param id User full id
