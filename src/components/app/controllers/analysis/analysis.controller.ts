@@ -21,10 +21,6 @@ export default class Analysis {
 		this.container = container;
 
 		this.worker = new Worker();
-		///REMOVE
-		/*this.worker.postMessage({
-			users: users
-		});*/
 		this.worker.addEventListener("message", (eventArgs: MessageEvent) => {
 			this.renderResult(
 				eventArgs.data.result,
@@ -34,6 +30,16 @@ export default class Analysis {
 		});
 
 		this.updateUser();
+	}
+
+	/**
+	 * Clears analysis DOM
+	 */
+	public static clear(): void {
+		if (!this.container) return;
+
+		this.container.innerHTML = "";
+		this.container.appendChild(this.createBox());
 	}
 
 	/**
@@ -49,8 +55,11 @@ export default class Analysis {
 	 * @param map Users' sessions density map
 	 */
 	public static setMap(map: ISessionMap): void {
-		///IMPLEMENT
+		if (!this.worker) return;
 		//Send map to the worker, then it enables similarity heruistics
+		this.worker.postMessage({
+			map: map
+		});
 	}
 
 	/**

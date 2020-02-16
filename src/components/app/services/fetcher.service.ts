@@ -224,7 +224,7 @@ enum LoadStatus {
 }
 
 export interface ISessionMap {
-	[userId: string]: { [day: string]: number };
+	[userId: string]: { [hour: string]: number };
 }
 
 export interface IUserSessions {

@@ -29,24 +29,22 @@ manager.addAnalyzer(onlineAnalyzer);
 manager.addAnalyzer(offlineAnalyzer);
 
 function onMessage(eventArgs: MessageEvent): void {
-	if (eventArgs.data.users) {
-		const users: User[] = [];
-
-		for (const id in eventArgs.data.users) {
-			const user = eventArgs.data.users[id];
-			user.id = id;
-			users.push(User.fromObject(user));
-		}
-
+	if (eventArgs.data.map) {
 		//Add global analyzers
-		const densityMap = SimilarityAnalyzer.generateDensityMap(users);
-		const similarityAnalyzer = new SimilarityAnalyzer(densityMap, true);
-		const differenceAnalyzer = new SimilarityAnalyzer(densityMap, false);
+		const similarityAnalyzer = new SimilarityAnalyzer(
+			eventArgs.data.map,
+			true
+		);
+		const differenceAnalyzer = new SimilarityAnalyzer(
+			eventArgs.data.map,
+			false
+		);
 
 		manager.addAnalyzer(similarityAnalyzer);
 		manager.addAnalyzer(differenceAnalyzer);
 	} else if (eventArgs.data.user) {
 		const user = User.fromObject(eventArgs.data.user);
+		user.clearFilters();
 		manager.analyze(user);
 	} else {
 		Utils.log(
