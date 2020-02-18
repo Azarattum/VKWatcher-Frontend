@@ -9,7 +9,7 @@ export default class Offline extends Service<"">() {
 		//Register service worker
 		if ("serviceWorker" in navigator) {
 			try {
-				await navigator.serviceWorker.register("/service-worker.js");
+				await navigator.serviceWorker.register("service-worker.js");
 			} catch {
 				//Failed to register
 				Utils.log("Service Worker is disabled.", LogType.WARNING);
