@@ -75,9 +75,9 @@ export default class Selector {
 		};
 
 		//Setup canvas events
-		this.canvas.addEventListener("mousemove", update);
-		this.canvas.addEventListener("mouseleave", update);
-		this.canvas.addEventListener("touchmove", update);
+		this.canvas.addEventListener("mousemove", update, { passive: true });
+		this.canvas.addEventListener("mouseleave", update, { passive: true });
+		this.canvas.addEventListener("touchmove", update, { passive: true });
 	}
 
 	private registerSessionSelection(): void {
@@ -197,8 +197,8 @@ export default class Selector {
 		};
 
 		//Setup canvas events
-		this.canvas.addEventListener("mousemove", update);
-		this.canvas.addEventListener("mouseleave", update);
-		this.canvas.addEventListener("touchmove", update);
+		this.canvas.addEventListener("mousemove", update, { passive: true });
+		this.canvas.addEventListener("mouseleave", update, { passive: true });
+		this.canvas.addEventListener("touchmove", update, { passive: true });
 	}
 }

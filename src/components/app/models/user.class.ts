@@ -102,7 +102,7 @@ export default class User {
 	 * Adds a new session to the day
 	 * @param {Session} session New session
 	 */
-	public addSession(session: Session): void {
+	public async addSession(session: Session): Promise<void> {
 		//Recursively split the session
 		if (session.isOverNight()) {
 			for (const splittedSession of session.splitOverNights()) {
@@ -132,7 +132,7 @@ export default class User {
 			this.days[day] = new Day(session.from);
 		}
 
-		this.days[day].addSession(session);
+		return this.days[day].addSession(session);
 	}
 
 	/**

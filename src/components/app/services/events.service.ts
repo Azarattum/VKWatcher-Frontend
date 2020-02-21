@@ -229,19 +229,21 @@ export default class Envets extends Service<"registered">() {
 			}, 200);
 		});
 
-		Fetcher.addEventListener("gotsessions", (sessions: IUserSessions) => {
-			if (!sessions.sessions) return;
+		Fetcher.addEventListener(
+			"gotsessions",
+			async (sessions: IUserSessions) => {
+				if (!sessions.sessions) return;
 
-			Users.addSessions(sessions);
-
-			if (Users.isSelected(sessions.id)) {
-				//Update range because of new sessions
-				Interface.setRange({
-					from: Users.selected.firstDay,
-					to: Users.selected.lastDay
-				});
+				Users.addSessions(sessions);
+				if (Users.isSelected(sessions.id)) {
+					//Update range because of new sessions
+					Interface.setRange({
+						from: Users.selected.firstDay,
+						to: Users.selected.lastDay
+					});
+				}
 			}
-		});
+		);
 
 		Fetcher.addEventListener("gotmap", (map: ISessionMap) => {
 			Analysis.setMap(map);

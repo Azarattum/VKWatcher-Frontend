@@ -52,17 +52,13 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 	 * Adds user's sessions
 	 * @param sessions User's sessions object
 	 */
-	public static addSessions(sessions: IUserSessions): void {
+	public static async addSessions(sessions: IUserSessions): Promise<void> {
 		this.addUser(sessions.id);
 
 		const user = this.data.find(x => x.id == sessions.id);
 		if (user) {
 			const firstSessions = !user.firstDay;
-			for (const session of sessions.sessions) {
-				user.addSession(
-					new Session(session.from, session.to, session.platform)
-				);
-			}
+			await this.processSessions(user, sessions.sessions);
 
 			if (firstSessions) {
 				const period = new PeriodFilter("period");
@@ -115,6 +111,45 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 		}
 
 		this.call("dataupdated", true, false);
+	}
+
+	/**
+	 * Adds sessions to the user asyncronously
+	 * @param user User to process
+	 * @param sessions Sessions to add
+	 */
+	private static async processSessions(
+		user: User,
+		sessions: IUserSessions["sessions"],
+		maxTimePerChunk: number = 3
+	): Promise<void> {
+		return new Promise(resolve => {
+			let index = 0;
+
+			function now(): number {
+				return new Date().getTime();
+			}
+
+			function doChunk(): void {
+				const startTime = now();
+				while (
+					index < sessions.length &&
+					now() - startTime <= maxTimePerChunk
+				) {
+					const session = sessions[index];
+					user.addSession(
+						new Session(session.from, session.to, session.platform)
+					);
+					++index;
+				}
+				if (index < sessions.length) {
+					setTimeout(doChunk, 1);
+				} else {
+					resolve();
+				}
+			}
+			doChunk();
+		});
 	}
 }
 
