@@ -7,7 +7,7 @@ export default class Session {
 	public from: Date;
 	public to: Date;
 	public platform: Platforms;
-	public inSleep: false;
+	public inSleep: boolean;
 
 	/**
 	 * Creates a new session object

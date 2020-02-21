@@ -3,8 +3,10 @@ import User from "../../models/user.class";
 import { IResult } from "./analysers/analyzer.interface";
 import DateUtils from "../../../common/date.class";
 import { ISessionMap, IUserName } from "../../services/fetcher.service";
+import Service from "../../../common/service.abstract";
 
-export default class Analysis {
+export default class Analysis extends Service<"gotresult">() {
+	public static map: ISessionMap | null = null;
 	private static container: HTMLElement | null = null;
 	private static worker: Worker | null = null;
 	private static user: User | null;
@@ -57,6 +59,7 @@ export default class Analysis {
 	public static setMap(map: ISessionMap): void {
 		if (!this.worker) return;
 		//Send map to the worker, then it enables similarity heruistics
+		this.map = map;
 		this.worker.postMessage({
 			map: map
 		});
@@ -100,6 +103,7 @@ export default class Analysis {
 		description: string,
 		done: boolean
 	): void {
+		this.call("gotresult", result, description);
 		if (!this.container) return;
 		let box = document.querySelector(`[box-type='${description}']`);
 		const boxExists = !!box;

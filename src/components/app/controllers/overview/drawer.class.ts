@@ -131,6 +131,7 @@ export default class Drawer {
 
 		//Presetup canvas
 		ctx.font = size + "px " + font;
+		ctx.strokeStyle = "black";
 		ctx.textAlign = "center";
 
 		let inSleep = null;
@@ -188,16 +189,8 @@ export default class Drawer {
 					inSleep = null;
 				}
 
-				///TEMP! Just for NN testing!
 				if (session.inSleep) {
 					inSleep = y + length;
-					if (session.inSleep == 1) {
-						ctx.strokeStyle = "black";
-					} else if (session.inSleep == 2) {
-						ctx.strokeStyle = "green";
-					} else if (session.inSleep == 3) {
-						ctx.strokeStyle = "red";
-					}
 				}
 			}
 			//#endregion

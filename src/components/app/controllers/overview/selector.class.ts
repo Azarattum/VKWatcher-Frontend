@@ -1,6 +1,6 @@
 import User from "../../models/user.class";
 import DateUtils from "../../../common/date.class";
-import { Platforms } from "../../models/session.class";
+import Session, { Platforms } from "../../models/session.class";
 
 /**
  * Responsible for handling all user controlls
@@ -8,6 +8,7 @@ import { Platforms } from "../../models/session.class";
 export default class Selector {
 	public zoom: number;
 	public user: User | null;
+	public session: Session | null = null;
 	private selected: Date | null;
 	private canvas: HTMLCanvasElement;
 	private styles: {
@@ -125,12 +126,14 @@ export default class Selector {
 			//Check values
 			if (!this.selected || !day || dayIndex < 0 || days.length <= 0) {
 				block.style.opacity = "0";
+				this.session = null;
 				return;
 			}
 
 			//Find session
 			const date = DateUtils.combineDate(day.date, this.selected);
 			const session = day.getSession(date, true);
+			this.session = session;
 			if (!session) {
 				block.style.opacity = "0";
 				return;

@@ -1,14 +1,14 @@
 import User from "../../models/user.class";
-import { Platforms } from "../../models/session.class";
+import Session, { Platforms } from "../../models/session.class";
 import Selector from "./selector.class";
 import Drawer from "./drawer.class";
 
 export default class Overview {
+	public static canvas: HTMLCanvasElement | null = null;
 	private static selector: Selector | null = null;
 	private static drawer: Drawer | null = null;
 	private static user: User | null = null;
 	private static zoom: number | null = null;
-	private static canvas: HTMLCanvasElement | null = null;
 
 	public static initialize(): void {
 		const canvas = document.getElementById("overview-render");
@@ -28,6 +28,15 @@ export default class Overview {
 		this.updateColors();
 		this.updateStyles();
 		this.updateUser();
+	}
+
+	/**
+	 * Gets current selected session
+	 */
+	public static getSession(): Session | null {
+		if (!this.selector) return null;
+
+		return this.selector.session;
 	}
 
 	/**
