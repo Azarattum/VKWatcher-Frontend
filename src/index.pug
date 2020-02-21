@@ -2,17 +2,35 @@
 html(lang="en")
     head
         meta(charset="UTF-8")
-        meta(name="viewport", content="width=device-width, initial-scale=1.0")
-        meta(http-equiv="X-UA-Compatible", content="ie=edge")
+        meta(name="viewport" content="width=device-width, initial-scale=1.0")
+        meta(http-equiv="X-UA-Compatible" content="ie=edge")
         meta(name="apple-mobile-web-app-capable" content="yes")
         meta(name="apple-mobile-web-app-status-bar-style" content="black-translucent" id="bar")
         title VKWatcher Frontend
+        style
+            | body {
+            |       margin: 0;
+            |       
+            | }
+            | .head-section>.user-info {
+            |       font-family: Arial, Helvetica, sans-serif;
+            |       font-weight: bold;
+            |       font-size: 32px;  
+            |       color: rgb(63, 60, 66);
+            |       margin: 16px;
+            | }
+            | .user-controlls {
+            |       opacity: 0;
+            |       transition: 0.2s;
+            |       transition-property: opacity;
+            | }
     body
         .page
             //- Top section
             .head-section
                 .user-info
-                    .name Loading...
+                    //-///TEMP!
+                    .name Loading...v1.1
                     .id(onclick="Interface.openProfile(event)")
                 .user-controlls
                     .button.filters &#x2699;&#xFE0E;                        
@@ -38,4 +56,3 @@ html(lang="en")
                 .tab-content.chart(view="chart")
                 .tab-content.analysis(view="analysis")
             .space
-        
