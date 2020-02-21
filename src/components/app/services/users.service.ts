@@ -5,6 +5,7 @@ import Session from "../models/session.class";
 import EmptyFilter from "../models/filters/empty.class";
 import DeviceFilter from "../models/filters/device.class";
 import PeriodFilter from "../models/filters/period.class";
+import DateUtils from "../../common/date.class";
 
 /**
  * Service for managing users
@@ -58,22 +59,28 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 		const user = this.data.find(x => x.id == sessions.id);
 		if (user) {
 			const firstSessions = !user.firstDay;
+			if (firstSessions && sessions.sessions.length > 0) {
+				const period = new PeriodFilter("period");
+				period.from =
+					DateUtils.getGlobalDay(sessions.sessions[0].from * 1000) +
+					1;
+				period.to = DateUtils.getGlobalDay(
+					sessions.sessions[sessions.sessions.length - 1].to * 1000
+				);
+				user.addFilter(period);
+			}
+
 			await this.processSessions(user, sessions.sessions);
 
-			if (firstSessions) {
-				const period = new PeriodFilter("period");
-				period.from = user.firstDay + 1;
-				period.to = user.lastDay;
-				user.addFilter(period);
-			} else if (sessions.sessions.length == 0) {
+			if (!firstSessions && sessions.sessions.length == 0) {
 				const filter = user.getFilter("period") as PeriodFilter;
 				if (filter.from == user.firstDay + 1) {
 					filter.from = user.firstDay;
 				}
 			}
-		}
 
-		this.call("dataupdated", user == this.selected);
+			this.call("dataupdated", user == this.selected);
+		}
 	}
 
 	public static addUser(id: string): void {
@@ -120,8 +127,7 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 	 */
 	private static async processSessions(
 		user: User,
-		sessions: IUserSessions["sessions"],
-		maxTimePerChunk: number = 3
+		sessions: IUserSessions["sessions"]
 	): Promise<void> {
 		return new Promise(resolve => {
 			let index = 0;
@@ -132,16 +138,16 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 
 			function doChunk(): void {
 				const startTime = now();
-				while (
-					index < sessions.length &&
-					now() - startTime <= maxTimePerChunk
-				) {
+				do {
+					if (index >= sessions.length) break;
+
 					const session = sessions[index];
 					user.addSession(
 						new Session(session.from, session.to, session.platform)
 					);
-					++index;
-				}
+					index++;
+				} while (now() - startTime <= 3);
+
 				if (index < sessions.length) {
 					setTimeout(doChunk, 1);
 				} else {

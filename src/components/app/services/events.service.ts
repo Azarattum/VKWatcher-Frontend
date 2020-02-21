@@ -234,7 +234,7 @@ export default class Envets extends Service<"registered">() {
 			async (sessions: IUserSessions) => {
 				if (!sessions.sessions) return;
 
-				Users.addSessions(sessions);
+				await Users.addSessions(sessions);
 				if (Users.isSelected(sessions.id)) {
 					//Update range because of new sessions
 					Interface.setRange({

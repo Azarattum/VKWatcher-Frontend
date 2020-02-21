@@ -8,7 +8,6 @@ import IFilter from "./filters/filter.interface";
 export default class Day {
 	public date: Date;
 	public sessions: Session[];
-	private existing: Set<number>;
 
 	/**
 	 * Creates a day object for storing sessions
@@ -17,7 +16,6 @@ export default class Day {
 	public constructor(date: Date | number, sessions: Session[] = []) {
 		this.date = DateUtils.normalizeDateUp(date);
 		this.sessions = sessions;
-		this.existing = new Set(sessions.map(x => +x.from));
 	}
 
 	/**
@@ -35,9 +33,8 @@ export default class Day {
 			}
 		} else {
 			//Push only unique sessions
-			if (!check || !this.existing.has(+session.from)) {
+			if (!check || !this.sessions.find(x => +x.from == +session.from)) {
 				this.sessions.push(session);
-				this.existing.add(+session.from);
 			}
 		}
 	}

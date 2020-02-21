@@ -33,7 +33,9 @@ export default class Interface extends Service<
 					return isNaN(value) ? "" : date;
 				},
 				onChange: (data): void => {
-					this.call("periodchanged", data.from, data.to);
+					setTimeout(() => {
+						this.call("periodchanged", data.from, data.to);
+					}, 1);
 				}
 			}
 		);
