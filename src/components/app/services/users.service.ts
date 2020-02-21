@@ -70,7 +70,15 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 				user.addFilter(period);
 			}
 
-			await this.processSessions(user, sessions.sessions);
+			if (this.selected == user) {
+				for (const session of sessions.sessions) {
+					user.addSession(
+						new Session(session.from, session.to, session.platform)
+					);
+				}
+			} else {
+				await this.processSessions(user, sessions.sessions);
+			}
 
 			if (!firstSessions && sessions.sessions.length == 0) {
 				const filter = user.getFilter("period") as PeriodFilter;
@@ -146,7 +154,7 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 						new Session(session.from, session.to, session.platform)
 					);
 					index++;
-				} while (now() - startTime <= 3);
+				} while (now() - startTime <= 2);
 
 				if (index < sessions.length) {
 					setTimeout(doChunk, 1);

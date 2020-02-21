@@ -15,7 +15,7 @@ ctx.addEventListener("message", async (eventArgs: MessageEvent) => {
  */
 class Fetcher {
 	private static readonly maxRequests = 3;
-	private static readonly requestInterval = 100;
+	private static readonly requestInterval = 200;
 	private static activeRequests = 0;
 	private static loadStatuses: LoadStatus[];
 	private static url: string;

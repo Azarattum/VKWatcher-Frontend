@@ -36,7 +36,7 @@ export default class Envets extends Service<"registered">() {
 	private static registerUsers(): void {
 		let userChanging = false;
 		//Changed Event
-		Users.addEventListener("userchanged", async (user: User) => {
+		Users.addEventListener("userchanged", (user: User) => {
 			//Get user's data
 			userChanging = true;
 			const period = (user.getFilter("period") as unknown) as {
@@ -56,11 +56,9 @@ export default class Envets extends Service<"registered">() {
 			if (name) name.textContent = user.name;
 			if (id) id.textContent = user.id.toString();
 
-			//Update data
-			Overview.updateUser(user);
-
 			//Update interface
 			setTimeout(() => {
+				Overview.updateUser(user);
 				Chart.updateUser(user);
 				Analysis.updateUser(user);
 				Interface.setEmpty(!empty.enabled);
@@ -70,7 +68,7 @@ export default class Envets extends Service<"registered">() {
 					Interface.setPeriod(period);
 				}
 				userChanging = false;
-			}, 100);
+			}, 10);
 		});
 
 		//Updated Event
@@ -226,7 +224,7 @@ export default class Envets extends Service<"registered">() {
 						.getElementById("overview-render")
 						?.style.setProperty("transition", "none");
 				}, 300);
-			}, 200);
+			}, 400);
 		});
 
 		Fetcher.addEventListener(
