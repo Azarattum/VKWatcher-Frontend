@@ -17,6 +17,7 @@ import AnalysisView from "./views/analysis/analysis.view";
 import IconsView from "./views/icons/icons.view";
 import Fetcher from "./services/fetcher.service";
 import Offline from "./services/offline.service";
+import Gathering from "./services/gathering.service";
 
 /**
  * Main application class
@@ -39,7 +40,8 @@ export default class App {
 			Events,
 			Fetcher,
 			Tabs,
-			Hash
+			Hash,
+			Gathering
 		];
 
 		const views = [
@@ -68,7 +70,7 @@ export default class App {
 		}
 
 		return {
-			Fetcher: [""],
+			Fetcher: ["https://apivkw.hldns.ru"],
 			Tabs: [
 				[
 					this.manger.getView("Overview"),
