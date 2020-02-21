@@ -125,7 +125,7 @@ export default class Drawer {
 		const font = this.styles.date.font;
 		const size = Math.min(
 			height / 2.3,
-			(this.viewport.width - left) / (days.length * 3)
+			(this.viewport.width - left) / (days.length * 3.5)
 		);
 		const hour = (this.viewport.height - height) / 24;
 
@@ -144,17 +144,19 @@ export default class Drawer {
 			const date = dateFull[1] + " " + dateFull[2];
 
 			//Render date
-			ctx.fillStyle = color;
-			ctx.fillText(
-				weekDay,
-				left + width * i + width / 2,
-				this.viewport.height - size
-			);
-			ctx.fillText(
-				date,
-				left + width * i + width / 2,
-				this.viewport.height
-			);
+			if (days.length < this.viewport.width / 32) {
+				ctx.fillStyle = color;
+				ctx.fillText(
+					weekDay,
+					left + width * i + width / 2,
+					this.viewport.height - size
+				);
+				ctx.fillText(
+					date,
+					left + width * i + width / 2,
+					this.viewport.height
+				);
+			}
 			//#endregion
 
 			//#region Columns drawing
