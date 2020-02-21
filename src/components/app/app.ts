@@ -68,7 +68,7 @@ export default class App {
 		}
 
 		return {
-			Fetcher: [""],
+			Fetcher: ["https://vkw.hldns.ru"],
 			Tabs: [
 				[
 					this.manger.getView("Overview"),

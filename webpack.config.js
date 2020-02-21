@@ -65,8 +65,8 @@ module.exports = {
 	optimization: {
 		splitChunks: {
 			chunks: "all",
-			minSize: 30000,
-			maxSize: 0,
+			minSize: 60000,
+			maxSize: 240000,
 			minChunks: 1,
 			maxAsyncRequests: 6,
 			maxInitialRequests: 4,
@@ -98,5 +98,9 @@ module.exports = {
 					})
 			  ]
 			: []
-	}
+	},
+	node: {
+		fs: "empty"
+	},
+	target: "web"
 };
