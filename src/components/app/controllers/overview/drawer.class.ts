@@ -6,6 +6,7 @@ import Day from "../../models/day.class";
  */
 export default class Drawer {
 	public user: User | null;
+	public drawSleep: boolean;
 	private canvas: HTMLCanvasElement | OffscreenCanvas;
 	private context:
 		| OffscreenCanvasRenderingContext2D
@@ -28,6 +29,7 @@ export default class Drawer {
 			throw new Error("Unable to get canvas context!");
 		}
 
+		this.drawSleep = false;
 		this.canvas = canvas;
 		this.context = ctx;
 		this.user = user;
@@ -191,7 +193,7 @@ export default class Drawer {
 					inSleep = null;
 				}
 
-				if (session.inSleep) {
+				if (this.drawSleep && session.inSleep) {
 					inSleep = y + length;
 				}
 			}

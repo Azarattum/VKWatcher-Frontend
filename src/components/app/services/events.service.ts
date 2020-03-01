@@ -12,6 +12,7 @@ import Fetcher, {
 	IUserSessions,
 	ISessionMap
 } from "./fetcher.service";
+import { IResult } from "../controllers/analysis/analysers/analyzer.interface";
 
 /**
  * One service to rule them all!
@@ -21,6 +22,7 @@ import Fetcher, {
 export default class Envets extends Service<"registered">() {
 	public static async initialize(): Promise<void> {
 		//Register service events
+		this.registerAnalysis();
 		this.registerFetcher();
 		this.registerUsers();
 		this.registerInterface();
@@ -28,6 +30,18 @@ export default class Envets extends Service<"registered">() {
 		this.registerTabs();
 
 		this.call("registered");
+	}
+
+	/**
+	 * Register Analysis service events
+	 */
+	private static registerAnalysis(): void {
+		//Got new analysis result event
+		Analysis.addEventListener("gotresult", (result: IResult) => {
+			if (result.format == "sleep") {
+				Interface.setSleep(true);
+			}
+		});
 	}
 
 	/**
@@ -62,6 +76,7 @@ export default class Envets extends Service<"registered">() {
 				Chart.updateUser(user);
 				Analysis.updateUser(user);
 				Interface.setEmpty(!empty.enabled);
+				Interface.setSleep(false);
 				Interface.setPlatform(device.platform || -1);
 				Interface.setRange({ from: user.firstDay, to: user.lastDay });
 				if (period) {
@@ -143,6 +158,12 @@ export default class Envets extends Service<"registered">() {
 				enabled: !value
 			});
 		});
+
+		//Sleep Render Toggled Event
+		Interface.addEventListener("sleepchanged", (value: boolean) => {
+			Overview.toggleSleepRender(value);
+			Overview.updateUser();
+		});
 	}
 
 	/**
@@ -207,6 +228,7 @@ export default class Envets extends Service<"registered">() {
 			Interface.setZoom(zoom);
 			Interface.setPlatform(device);
 			Interface.setEmpty(empty);
+			Interface.setSleep(false);
 			if (period) {
 				Interface.setPeriod({
 					from: +period[0],

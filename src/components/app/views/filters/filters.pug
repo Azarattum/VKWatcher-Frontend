@@ -22,3 +22,7 @@ span.label Filters:
     span.label Zoom:
     .zoom
         input(type="text")#zoom-slider
+
+    label.sleep-container.disabled
+        input(type="checkbox" onclick="Interface.toggleSleep(event)")#empty
+        div#sleep-render Sleep Predictions

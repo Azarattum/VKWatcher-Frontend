@@ -31,6 +31,20 @@ export default class Overview {
 	}
 
 	/**
+	 * Toggles sleep render in the drawer
+	 * @param enabled Whether to render sleep sessions
+	 */
+	public static toggleSleepRender(enabled?: boolean): void {
+		if (!this.drawer) return;
+
+		if (enabled == undefined) {
+			enabled = !this.drawer.drawSleep;
+		}
+
+		this.drawer.drawSleep = enabled;
+	}
+
+	/**
 	 * Gets current selected session
 	 */
 	public static getSession(): Session | null {

@@ -8,14 +8,19 @@ export default class Interface extends Service<
 	| "periodchanged"
 	| "emptychanged"
 	| "devicechanged"
+	| "sleepchanged"
 >() {
 	private static periodSlider: Slider;
 	private static zoomSlider: Slider;
 	private static emptyButton: HTMLInputElement;
 	private static deviceSelector: HTMLSelectElement;
+	private static sleepButton: HTMLElement;
 
 	public static initialize(): void {
 		this.emptyButton = document.getElementById("empty") as HTMLInputElement;
+		this.sleepButton = document.getElementById(
+			"sleep-render"
+		) as HTMLInputElement;
 		this.deviceSelector = document.getElementById(
 			"device"
 		) as HTMLSelectElement;
@@ -61,6 +66,22 @@ export default class Interface extends Service<
 				"emptychanged",
 				(event.target as HTMLInputElement).checked,
 				true
+			);
+		});
+
+		this.expose("toggleSleep", (event: MouseEvent): void => {
+			if (
+				(event.target as HTMLInputElement).parentElement?.classList.contains(
+					"disabled"
+				)
+			) {
+				event.preventDefault();
+				return;
+			}
+
+			this.call(
+				"sleepchanged",
+				(event.target as HTMLInputElement).checked
 			);
 		});
 
@@ -146,5 +167,13 @@ export default class Interface extends Service<
 			min: range.from,
 			max: range.to
 		});
+	}
+
+	/**
+	 * Sets availability of the sleep button
+	 * @param enabled Is sleep render button enabled
+	 */
+	public static setSleep(enabled: boolean): void {
+		this.sleepButton.parentElement?.classList.toggle("disabled", !enabled);
 	}
 }
