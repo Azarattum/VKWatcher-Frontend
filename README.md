@@ -9,6 +9,7 @@ Front end web application for processing data from VKWatcher-Backend
   - Run analyzers on your data
   - Compatible with mobile devices
   - Offline-first architecture
+  - Neural network powered user sleep analysis
   - And more...
 
 ### Usage:
