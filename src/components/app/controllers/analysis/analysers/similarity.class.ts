@@ -1,4 +1,4 @@
-import IAnalyzer, { IResult } from "./analyzer.interface";
+import IAnalyzer, { IResult, ISessionMap } from "./analyzer.interface";
 import User from "../../../models/user.class";
 
 /**
@@ -90,8 +90,4 @@ export default class SimilarityAnalyzer implements IAnalyzer {
 
 		return result;
 	}
-}
-
-export interface ISessionMap {
-	[userId: string]: { [hour: string]: number };
 }

@@ -4,6 +4,7 @@ import { IResult } from "./analysers/analyzer.interface";
 import DateUtils from "../../../common/date.class";
 import { ISessionMap, IUserName } from "../../services/fetcher.service";
 import Service from "../../../common/service.abstract";
+import Session from "../../models/session.class";
 
 export default class Analysis extends Service<"gotresult">() {
 	public static map: ISessionMap | null = null;
@@ -104,6 +105,10 @@ export default class Analysis extends Service<"gotresult">() {
 		done: boolean
 	): void {
 		this.call("gotresult", result, description);
+		if (result.format == "sleep") {
+			this.renderSleepAnalysis(result[0]);
+			return;
+		}
 		if (!this.container) return;
 		let box = document.querySelector(`[box-type='${description}']`);
 		const boxExists = !!box;
@@ -161,6 +166,22 @@ export default class Analysis extends Service<"gotresult">() {
 			for (let i = 0; i < length; i++) {
 				const item = items.item(0);
 				if (item) item.remove();
+			}
+		}
+	}
+
+	private static renderSleepAnalysis(data: string): void {
+		if (!this.user) return;
+		let i = 0;
+		let previous: Session | null = null;
+		for (const day of Object.values(this.user.days)) {
+			for (const session of day.sessions) {
+				session.inSleep = data[i] == "1";
+				i++;
+				if (previous && +session.from - +previous.to > 57600000) {
+					previous.inSleep = false;
+				}
+				previous = session;
 			}
 		}
 	}

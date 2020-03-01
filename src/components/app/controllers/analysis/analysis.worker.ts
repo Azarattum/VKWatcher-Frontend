@@ -15,7 +15,9 @@ const manager = new AnalyzersManager(onAnalyzed);
 
 ctx.addEventListener("message", onMessage);
 
-const sleepAnalyzer = new SleepAnalyzer();
+let sleepAnalyzer: SleepAnalyzer;
+let similarityAnalyzer: SimilarityAnalyzer;
+let differenceAnalyzer: SimilarityAnalyzer;
 const durationAnalyzer = new DurationAnalyzer();
 const activityAnalyzer = new ActivityAnalyzer();
 const platformAnalyzer = new PlatformAnalyzer();
@@ -29,22 +31,17 @@ manager.addAnalyzer(pickupsAnalyzer);
 manager.addAnalyzer(platformAnalyzer);
 manager.addAnalyzer(onlineAnalyzer);
 manager.addAnalyzer(offlineAnalyzer);
-manager.addAnalyzer(sleepAnalyzer);
 
 function onMessage(eventArgs: MessageEvent): void {
 	if (eventArgs.data.map) {
 		//Add global analyzers
-		const similarityAnalyzer = new SimilarityAnalyzer(
-			eventArgs.data.map,
-			true
-		);
-		const differenceAnalyzer = new SimilarityAnalyzer(
-			eventArgs.data.map,
-			false
-		);
+		sleepAnalyzer = new SleepAnalyzer(eventArgs.data.map);
+		similarityAnalyzer = new SimilarityAnalyzer(eventArgs.data.map, true);
+		differenceAnalyzer = new SimilarityAnalyzer(eventArgs.data.map, false);
 
 		manager.addAnalyzer(similarityAnalyzer);
 		manager.addAnalyzer(differenceAnalyzer);
+		manager.addAnalyzer(sleepAnalyzer);
 	} else if (eventArgs.data.user) {
 		const user = User.fromObject(eventArgs.data.user);
 		user.clearFilters();
@@ -58,6 +55,11 @@ function onMessage(eventArgs: MessageEvent): void {
 }
 
 function onAnalyzed(result: IResult, description: string, done: boolean): void {
+	if (sleepAnalyzer && description == "Prefered Offline Periods") {
+		const parts = result[0].split(" ");
+		sleepAnalyzer.setOfflinePeriod(+parts[0], +parts[1]);
+	}
+
 	ctx.postMessage({
 		result: result,
 		description: description,

@@ -18,5 +18,9 @@ export interface IResult {
 	max?: number;
 	avg?: number;
 
-	format?: "time" | "period" | "user";
+	format?: "time" | "period" | "user" | "sleep";
+}
+
+export interface ISessionMap {
+	[userId: string]: { [hour: string]: number };
 }
