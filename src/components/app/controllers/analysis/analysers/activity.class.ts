@@ -1,4 +1,4 @@
-import IAnalyzer, { IResult } from "./analyzer.interface";
+import IAnalyzer, { IResult, IToken } from "./analyzer.interface";
 import User from "../../../models/user.class";
 import EmptyFilter from "../../../models/filters/empty.class";
 
@@ -8,7 +8,7 @@ import EmptyFilter from "../../../models/filters/empty.class";
 export default class ActivityAnalyzer implements IAnalyzer {
 	public readonly description = "Time Per Day";
 
-	public async analyze(user: User): Promise<IResult> {
+	public async analyze(user: User, token: IToken): Promise<IResult | null> {
 		const result: IResult = {};
 
 		const durations: number[] = [];
@@ -17,6 +17,7 @@ export default class ActivityAnalyzer implements IAnalyzer {
 			durations.push(day.sessions.reduce((a, b) => a + b.length, 0))
 		);
 		if (durations.length <= 0) return [];
+		if (token.isCanceled) return null;
 
 		result.min = Math.min(...durations);
 		result.max = Math.max(...durations);

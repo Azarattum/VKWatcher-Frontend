@@ -1,4 +1,4 @@
-import IAnalyzer, { IResult, ISessionMap } from "./analyzer.interface";
+import IAnalyzer, { IResult, ISessionMap, IToken } from "./analyzer.interface";
 import User from "../../../models/user.class";
 
 /**
@@ -58,9 +58,10 @@ export default class SimilarityAnalyzer implements IAnalyzer {
 		);
 	}
 
-	public async analyze(user: User): Promise<IResult> {
+	public async analyze(user: User, token: IToken): Promise<IResult | null> {
 		const scores: { [id: string]: number } = {};
 		if (Object.keys(this.densityMap[user.id]).length <= 0) return [];
+		if (token.isCanceled) return null;
 
 		for (const id in this.densityMap) {
 			//Ignore self and empty users
@@ -71,6 +72,7 @@ export default class SimilarityAnalyzer implements IAnalyzer {
 
 			//Count score difference
 			scores[id] = this.pcos(user.id, id);
+			if (token.isCanceled) return null;
 		}
 
 		const result: IResult = Object.entries(scores)

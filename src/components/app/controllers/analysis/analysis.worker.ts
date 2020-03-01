@@ -9,6 +9,7 @@ import PeriodAnalyzer from "./analysers/period.class";
 import SimilarityAnalyzer from "./analysers/similarity.class";
 import Utils, { LogType } from "../../../common/utils.class";
 import SleepAnalyzer from "./analysers/sleep.class";
+import SleepStatsAnalyzer from "./analysers/sleepstats.class";
 
 const ctx: Worker = self as any;
 const manager = new AnalyzersManager(onAnalyzed);
@@ -18,6 +19,7 @@ ctx.addEventListener("message", onMessage);
 let sleepAnalyzer: SleepAnalyzer;
 let similarityAnalyzer: SimilarityAnalyzer;
 let differenceAnalyzer: SimilarityAnalyzer;
+const sleepStatsAnalyzer = new SleepStatsAnalyzer();
 const durationAnalyzer = new DurationAnalyzer();
 const activityAnalyzer = new ActivityAnalyzer();
 const platformAnalyzer = new PlatformAnalyzer();
@@ -42,9 +44,11 @@ function onMessage(eventArgs: MessageEvent): void {
 		manager.addAnalyzer(similarityAnalyzer);
 		manager.addAnalyzer(differenceAnalyzer);
 		manager.addAnalyzer(sleepAnalyzer);
+		manager.addAnalyzer(sleepStatsAnalyzer);
 	} else if (eventArgs.data.user) {
 		const user = User.fromObject(eventArgs.data.user);
 		user.clearFilters();
+		sleepStatsAnalyzer.setSleepSessions(null);
 		manager.analyze(user);
 	} else {
 		Utils.log(
@@ -58,6 +62,9 @@ function onAnalyzed(result: IResult, description: string, done: boolean): void {
 	if (sleepAnalyzer && description == "Prefered Offline Periods") {
 		const parts = result[0].split(" ");
 		sleepAnalyzer.setOfflinePeriod(+parts[0], +parts[1]);
+	}
+	if (description == "Sleep") {
+		sleepStatsAnalyzer.setSleepSessions(result[0]);
 	}
 
 	ctx.postMessage({

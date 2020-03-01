@@ -6,7 +6,7 @@ import User from "../../../models/user.class";
 export default interface IAnalyzer {
 	description: string;
 
-	analyze(user: User): Promise<IResult | null>;
+	analyze(user: User, token?: IToken): Promise<IResult | null>;
 }
 
 /**
@@ -18,9 +18,13 @@ export interface IResult {
 	max?: number;
 	avg?: number;
 
-	format?: "time" | "period" | "user" | "sleep";
+	format?: "time" | "period" | "user" | "sleep" | "stats";
 }
 
 export interface ISessionMap {
 	[userId: string]: { [hour: string]: number };
+}
+
+export interface IToken {
+	isCanceled: boolean;
 }

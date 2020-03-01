@@ -1,4 +1,4 @@
-import IAnalyzer, { IResult } from "./analyzer.interface";
+import IAnalyzer, { IResult, IToken } from "./analyzer.interface";
 import User from "../../../models/user.class";
 import Tensorflow from "../../../../vendor/tensorflow/tensorflow";
 import Day from "../../../models/day.class";
@@ -34,7 +34,7 @@ export default class SleepAnalyzer implements IAnalyzer {
 		});
 	}
 
-	public async analyze(user: User): Promise<IResult | null> {
+	public async analyze(user: User, token: IToken): Promise<IResult | null> {
 		if (!this.tf.ready || !this.offlinePeriod) {
 			await this.awaitForLoad();
 		}
@@ -43,6 +43,8 @@ export default class SleepAnalyzer implements IAnalyzer {
 		const input: number[][] = [];
 		const map = this.densityMap[user.id];
 		const days = user.getDays();
+		if (days.length <= 0) return null;
+
 		for (let i = 0; i < days.length; i++) {
 			//Find 3 days
 			const day = days[i];
@@ -53,15 +55,17 @@ export default class SleepAnalyzer implements IAnalyzer {
 
 			for (let j = 0; j < day.sessions.length; j++) {
 				input.push(this.generateData(j, day, nextDay, map));
+				if (token.isCanceled) return null;
 			}
 		}
 
-		[1, 2, 4, 12, 32, 1].map(x => true);
 		const preditions = await this.tf.predict(input);
+		if (token.isCanceled) return null;
 		if (!preditions) return null;
 		result[0] = "";
 		for (const prediction of preditions) {
 			result[0] += (prediction > 0.65 ? 1 : 0).toString();
+			if (token.isCanceled) return null;
 		}
 
 		return result;

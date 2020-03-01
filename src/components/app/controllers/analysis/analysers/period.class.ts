@@ -1,4 +1,4 @@
-import IAnalyzer, { IResult } from "./analyzer.interface";
+import IAnalyzer, { IResult, IToken } from "./analyzer.interface";
 import User from "../../../models/user.class";
 import Session from "../../../models/session.class";
 
@@ -16,7 +16,7 @@ export default class PeriodAnalyzer implements IAnalyzer {
 		this.isOnline = isOnline;
 	}
 
-	public async analyze(user: User): Promise<IResult> {
+	public async analyze(user: User, token: IToken): Promise<IResult | null> {
 		const result: IResult = [];
 		const periods: number[] = Array(...Array(24 * 2)).map(x => 0);
 
@@ -42,6 +42,7 @@ export default class PeriodAnalyzer implements IAnalyzer {
 			}
 
 			periods[index] += left;
+			if (token.isCanceled) return null;
 		}
 
 		//Search for needed periods
@@ -88,14 +89,17 @@ export default class PeriodAnalyzer implements IAnalyzer {
 			for (const i of top) {
 				periods[i] = Infinity * (this.isOnline ? -1 : 1);
 			}
+			if (token.isCanceled) return null;
 		}
 
 		results = results.filter((value, index, self) => {
 			return self.indexOf(value) === index;
 		});
+		if (token.isCanceled) return null;
 		if (!this.isOnline) {
 			results.sort((a, b) => (a > b ? 1 : -1));
 		}
+		if (token.isCanceled) return null;
 		//Split the results
 		let j = 0;
 		for (let i = 0; i < results.length; i++) {
@@ -112,6 +116,7 @@ export default class PeriodAnalyzer implements IAnalyzer {
 			(result[j] as any).push(results[i]);
 		}
 
+		if (token.isCanceled) return null;
 		//Normalize
 		for (const i in result) {
 			result[i] = result[i][0] + " " + result[i][result[i].length - 1];

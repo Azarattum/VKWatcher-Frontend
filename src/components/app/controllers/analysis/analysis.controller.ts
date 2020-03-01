@@ -111,7 +111,6 @@ export default class Analysis extends Service<"gotresult">() {
 		}
 		if (!this.container) return;
 		let box = document.querySelector(`[box-type='${description}']`);
-		const boxExists = !!box;
 		if (!box) {
 			box = document.querySelector(`[box-type='Loading']`);
 			if (box) {
@@ -158,9 +157,7 @@ export default class Analysis extends Service<"gotresult">() {
 			box.appendChild(div);
 		}
 
-		if (!done && !boxExists) {
-			this.container.appendChild(this.createBox());
-		} else {
+		if (done) {
 			const items = document.querySelectorAll(`[box-type='Loading']`);
 			const length = items.length;
 			for (let i = 0; i < length; i++) {
@@ -205,9 +202,26 @@ export default class Analysis extends Service<"gotresult">() {
 				case "period": {
 					const parts = value.split(" ");
 					format += Math.floor(+parts[0] / 2) + ":";
-					format += (+parts[0] % 2 ? "30" : "00") + " - ";
-					format += Math.ceil(+parts[1] / 2) + ":";
-					format += +parts[1] % 2 ? "00" : "30";
+					format += +parts[0] % 2 ? "30" : "00";
+					if (parts.length > 1) {
+						format += " - ";
+						format += Math.ceil(+parts[1] / 2) + ":";
+						format += +parts[1] % 2 ? "00" : "30";
+					}
+					break;
+				}
+				case "stats": {
+					const stats = ["Length", "From", "To"];
+					format += stats[+key] + ": ";
+					if (+key == 0) {
+						format += DateUtils.getReadableDuration(+value);
+					} else {
+						let hours = Math.floor(+value / 60).toString();
+						let minutes = Math.round(+value % 60).toString();
+						if (hours.length == 1) hours = "0" + hours;
+						if (minutes.length == 1) minutes = "0" + minutes;
+						format += hours + ":" + minutes;
+					}
 					break;
 				}
 				default:

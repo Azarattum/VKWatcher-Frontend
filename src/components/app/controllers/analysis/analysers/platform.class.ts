@@ -1,4 +1,4 @@
-import IAnalyzer, { IResult } from "./analyzer.interface";
+import IAnalyzer, { IResult, IToken } from "./analyzer.interface";
 import User from "../../../models/user.class";
 import EmptyFilter from "../../../models/filters/empty.class";
 import { Platforms } from "../../../models/session.class";
@@ -9,7 +9,7 @@ import { Platforms } from "../../../models/session.class";
 export default class PlatformAnalyzer implements IAnalyzer {
 	public readonly description = "Prefered Platforms";
 
-	public async analyze(user: User): Promise<IResult> {
+	public async analyze(user: User, token: IToken): Promise<IResult | null> {
 		const platforms: number[] = Array(
 			...Array(Object.keys(Platforms).length)
 		).map(x => 0);
@@ -21,6 +21,7 @@ export default class PlatformAnalyzer implements IAnalyzer {
 			})
 		);
 
+		if (token.isCanceled) return null;
 		const result = platforms
 			.slice()
 			.sort((a, b) => (a > b ? -1 : 1))

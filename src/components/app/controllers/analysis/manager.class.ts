@@ -1,5 +1,5 @@
 import User from "../../models/user.class";
-import IAnalyzer, { IResult } from "./analysers/analyzer.interface";
+import IAnalyzer, { IResult, IToken } from "./analysers/analyzer.interface";
 
 /**
  * Manager for analyzers
@@ -11,7 +11,7 @@ export default class AnalyzersManager {
 		done: boolean
 	) => void;
 	private analyzers: IAnalyzer[];
-	private analysisId = 0;
+	private tokens: IToken[] = [];
 
 	/**
 	 * Creates manager for analyzers
@@ -37,23 +37,27 @@ export default class AnalyzersManager {
 	 * @param user User to analyze
 	 */
 	public async analyze(user: User): Promise<void> {
-		this.analysisId++;
-		const currentId = this.analysisId;
-		let analyzed = 0;
+		const token = { isCanceled: false };
+		this.tokens.forEach(x => (x.isCanceled = true));
+		if (this.tokens.length > 10) {
+			this.tokens = [];
+		}
+		this.tokens.push(token);
 
-		for (const analyzer of this.analyzers) {
-			if (currentId != this.analysisId) return;
-			setTimeout(() => {
-				analyzer.analyze(user).then((result: IResult | null) => {
-					analyzed++;
-					if (currentId == this.analysisId && result != null) {
-						this.callback(
-							result,
-							analyzer.description,
-							analyzed >= this.analyzers.length
-						);
-					}
-				});
+		let analyzed = 0;
+		const length = this.analyzers.length;
+		for (let i = 0; i < length; i++) {
+			const analyzer = this.analyzers[i];
+			setTimeout(async () => {
+				const result = await analyzer.analyze(user, token);
+				analyzed++;
+				if (result != null && !token.isCanceled) {
+					this.callback(
+						result,
+						analyzer.description,
+						analyzed >= length || token.isCanceled
+					);
+				}
 			}, 50);
 		}
 	}

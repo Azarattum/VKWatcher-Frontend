@@ -1,4 +1,4 @@
-import IAnalyzer, { IResult } from "./analyzer.interface";
+import IAnalyzer, { IResult, IToken } from "./analyzer.interface";
 import User from "../../../models/user.class";
 
 /**
@@ -7,7 +7,7 @@ import User from "../../../models/user.class";
 export default class DurationAnalyzer implements IAnalyzer {
 	public readonly description = "Session Duration";
 
-	public async analyze(user: User): Promise<IResult> {
+	public async analyze(user: User, token: IToken): Promise<IResult | null> {
 		const result: IResult = {};
 
 		const sessions: number[] = [];
@@ -15,6 +15,7 @@ export default class DurationAnalyzer implements IAnalyzer {
 			sessions.push(...day.sessions.map(session => session.length))
 		);
 		if (sessions.length <= 0) return [];
+		if (token.isCanceled) return null;
 
 		result.min = Math.min(...sessions);
 		result.max = Math.max(...sessions);
