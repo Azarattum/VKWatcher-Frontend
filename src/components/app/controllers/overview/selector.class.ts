@@ -103,8 +103,10 @@ export default class Selector {
 		}
 		const oneDay = 24 * 60 * 60;
 
+		let isScrolling: boolean = false;
+		let scrollingTimeout: number;
 		const update = (eventArgs: MouseEvent | TouchEvent): void => {
-			if (!this.user) return;
+			if (!this.user || isScrolling) return;
 
 			//Calculate all values
 			const left =
@@ -200,5 +202,15 @@ export default class Selector {
 		this.canvas.addEventListener("mousemove", update, { passive: true });
 		this.canvas.addEventListener("mouseleave", update, { passive: true });
 		this.canvas.addEventListener("touchmove", update, { passive: true });
+		window.addEventListener("scroll", () => {
+			isScrolling = true;
+			this.session = null;
+			block.style.opacity = "0";
+
+			window.clearTimeout(scrollingTimeout);
+			scrollingTimeout = window.setTimeout(() => {
+				isScrolling = false;
+			}, 200);
+		});
 	}
 }
