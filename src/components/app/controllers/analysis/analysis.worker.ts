@@ -8,12 +8,14 @@ import PlatformAnalyzer from "./analysers/platform.class";
 import PeriodAnalyzer from "./analysers/period.class";
 import SimilarityAnalyzer from "./analysers/similarity.class";
 import Utils, { LogType } from "../../../common/utils.class";
+import SleepAnalyzer from "./analysers/sleep.class";
 
 const ctx: Worker = self as any;
 const manager = new AnalyzersManager(onAnalyzed);
 
 ctx.addEventListener("message", onMessage);
 
+const sleepAnalyzer = new SleepAnalyzer();
 const durationAnalyzer = new DurationAnalyzer();
 const activityAnalyzer = new ActivityAnalyzer();
 const platformAnalyzer = new PlatformAnalyzer();
@@ -27,6 +29,7 @@ manager.addAnalyzer(pickupsAnalyzer);
 manager.addAnalyzer(platformAnalyzer);
 manager.addAnalyzer(onlineAnalyzer);
 manager.addAnalyzer(offlineAnalyzer);
+manager.addAnalyzer(sleepAnalyzer);
 
 function onMessage(eventArgs: MessageEvent): void {
 	if (eventArgs.data.map) {

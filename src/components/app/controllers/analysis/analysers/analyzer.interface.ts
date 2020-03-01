@@ -6,7 +6,7 @@ import User from "../../../models/user.class";
 export default interface IAnalyzer {
 	description: string;
 
-	analyze(user: User): Promise<IResult>;
+	analyze(user: User): Promise<IResult | null>;
 }
 
 /**

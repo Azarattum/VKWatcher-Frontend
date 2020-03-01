@@ -44,9 +44,9 @@ export default class AnalyzersManager {
 		for (const analyzer of this.analyzers) {
 			if (currentId != this.analysisId) return;
 			setTimeout(() => {
-				analyzer.analyze(user).then((result: IResult) => {
+				analyzer.analyze(user).then((result: IResult | null) => {
 					analyzed++;
-					if (currentId == this.analysisId) {
+					if (currentId == this.analysisId && result != null) {
 						this.callback(
 							result,
 							analyzer.description,
