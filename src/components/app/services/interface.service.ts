@@ -175,5 +175,9 @@ export default class Interface extends Service<
 	 */
 	public static setSleep(enabled: boolean): void {
 		this.sleepButton.parentElement?.classList.toggle("disabled", !enabled);
+		if (!enabled && this.sleepButton.previousSibling) {
+			(this.sleepButton
+				.previousSibling as HTMLInputElement).checked = false;
+		}
 	}
 }

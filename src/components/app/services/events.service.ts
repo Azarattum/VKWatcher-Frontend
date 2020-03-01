@@ -72,6 +72,7 @@ export default class Envets extends Service<"registered">() {
 
 			//Update interface
 			setTimeout(() => {
+				Overview.toggleSleepRender(false);
 				Overview.updateUser(user);
 				Chart.updateUser(user);
 				Analysis.updateUser(user);
