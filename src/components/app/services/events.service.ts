@@ -125,11 +125,13 @@ export default class Envets extends Service<"registered">() {
 			"periodchanged",
 			(from: number, to: number) => {
 				if (from > to) from = to;
-				Hash.set("period", from + "-" + to);
-				Users.updateFilter("period", {
-					from: from,
-					to: to
-				});
+				if (Number.isFinite(from) && Number.isFinite(to)) {
+					Hash.set("period", from + "-" + to);
+					Users.updateFilter("period", {
+						from: from,
+						to: to
+					});
+				}
 			}
 		);
 
@@ -262,6 +264,24 @@ export default class Envets extends Service<"registered">() {
 					Interface.setRange({
 						from: Users.selected.firstDay,
 						to: Users.selected.lastDay
+					});
+					//Update period from hash after setting new range
+					const period = (Users.selected.getFilter(
+						"period"
+					) as unknown) as {
+						from: number;
+						to: number;
+					};
+					if (
+						!period ||
+						!Number.isFinite(period.from) ||
+						!Number.isFinite(period.to)
+					) {
+						return;
+					}
+					Interface.setPeriod({
+						from: period.from,
+						to: period.to
 					});
 				}
 			}

@@ -73,6 +73,12 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 						sessions.sessions[sessions.sessions.length - 1].to *
 							1000
 					);
+					if (period.from > period.to) {
+						period.from = period.to;
+					}
+					if (period.to - period.from > 30) {
+						period.from = period.to - 30;
+					}
 				}
 			}
 
