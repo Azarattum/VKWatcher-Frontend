@@ -60,14 +60,20 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 		if (user) {
 			const firstSessions = !user.firstDay;
 			if (firstSessions && sessions.sessions.length > 0) {
-				const period = new PeriodFilter("period");
-				period.from =
-					DateUtils.getGlobalDay(sessions.sessions[0].from * 1000) +
-					1;
-				period.to = DateUtils.getGlobalDay(
-					sessions.sessions[sessions.sessions.length - 1].to * 1000
-				);
-				user.addFilter(period);
+				const period = user.getFilter("period") as PeriodFilter;
+				if (
+					!Number.isFinite(period.from) ||
+					!Number.isFinite(period.to)
+				) {
+					period.from =
+						DateUtils.getGlobalDay(
+							sessions.sessions[0].from * 1000
+						) + 1;
+					period.to = DateUtils.getGlobalDay(
+						sessions.sessions[sessions.sessions.length - 1].to *
+							1000
+					);
+				}
 			}
 
 			if (this.selected == user) {
@@ -100,6 +106,7 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 		//Add filters
 		const empty = new EmptyFilter("empty");
 		const device = new DeviceFilter("device");
+		const period = new PeriodFilter("period");
 
 		//Setup filters
 		empty.toggle(false);
@@ -107,6 +114,7 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 		//Register filters
 		user.addFilter(empty);
 		user.addFilter(device);
+		user.addFilter(period);
 	}
 
 	public static select(id: number, relative: boolean = false): void {
