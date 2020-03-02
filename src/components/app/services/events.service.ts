@@ -124,6 +124,7 @@ export default class Envets extends Service<"registered">() {
 		Interface.addEventListener(
 			"periodchanged",
 			(from: number, to: number) => {
+				if (from > to) from = to;
 				Hash.set("period", from + "-" + to);
 				Users.updateFilter("period", {
 					from: from,

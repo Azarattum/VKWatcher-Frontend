@@ -120,6 +120,7 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 
 	public static updateFilter(id: number | string, params: any): void {
 		const filter = this.selected.getFilter(id);
+		if (!filter) return;
 
 		for (const param of Object.entries(params)) {
 			(filter as any)[param[0]] = param[1];
