@@ -32,8 +32,21 @@ export default class Day {
 				this.addSession(oneSession, check);
 			}
 		} else {
-			//Push only unique sessions
-			if (!check || !this.sessions.find(x => +x.from == +session.from)) {
+			//Push only unique sessions in the right order
+			let added = false;
+			if (check) {
+				for (let i = 0; i < this.sessions.length; i++) {
+					const from = +this.sessions[i].from;
+					if (+session.from < from) {
+						this.sessions.splice(i, 0, session);
+					}
+					if (+session.from <= from) {
+						added = true;
+						break;
+					}
+				}
+			}
+			if (!check || !added) {
 				this.sessions.push(session);
 			}
 		}
