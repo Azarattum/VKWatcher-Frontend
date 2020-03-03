@@ -44,7 +44,7 @@ export default class Chart {
 	 * @param {User} user New user changes user whose chart is drawing
 	 */
 	public async switch(user: User): Promise<void> {
-		if (Object.keys(user.days).length == 0) {
+		if (Object.keys(user.days).length < 1) {
 			this.container.innerHTML = "";
 			return;
 		}
@@ -79,7 +79,11 @@ export default class Chart {
 		this.chart._initializeStyle();
 		this.chart.chart = this.data;
 
-		if (!this.chart.drawer) return;
+		if (!this.chart.drawer) {
+			this.container.innerHTML = "";
+			this.container.className = "";
+			return;
+		}
 		//Custom format style
 		const func = this.chart.drawer.onrecalculated;
 		this.chart.drawer.onrecalculated = (): void => {
@@ -188,13 +192,17 @@ export default class Chart {
 		//Scan days
 		const total = [0, 0, 0, 0, 0, 0, 0, 0];
 		const days = Object.values(user.days);
-		for (let i = 0; i < days.length; i++) {
+		for (let i = 0; i <= days.length + 2; i++) {
 			const day = days[i];
-			data.columns[0][i + 1] = +day.date;
+			data.columns[0][i + 1] = day
+				? +day.date
+				: +days[days.length - 1].date + 3600 * 24 * 1000;
 			for (let j = 1; j < 9; j++) {
-				const sum = day.sessions.reduce((a, b) => {
-					return a + (b.platform == j - 1 ? b.length : 0);
-				}, 0);
+				const sum = day
+					? day.sessions.reduce((a, b) => {
+							return a + (b.platform == j - 1 ? b.length : 0);
+					  }, 0)
+					: 0;
 
 				data.columns[j][i + 1] = sum;
 				total[j - 1] += sum;

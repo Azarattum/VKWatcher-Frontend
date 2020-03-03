@@ -55,45 +55,39 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 	 */
 	public static async addSessions(sessions: IUserSessions): Promise<void> {
 		this.addUser(sessions.id);
+		if (sessions.sessions.length <= 0) return;
 
 		const user = this.data.find(x => x.id == sessions.id);
-		if (user) {
-			//Adjust the period filter on the first sessions
-			const firstSessions = !user.firstDay;
-			if (firstSessions && sessions.sessions.length > 0) {
-				const period = user.getFilter("period") as PeriodFilter;
-				if (
-					!Number.isFinite(period.from) ||
-					!Number.isFinite(period.to)
-				) {
-					period.to = DateUtils.getGlobalDay(
-						sessions.sessions[sessions.sessions.length - 1].to *
-							1000
-					);
-					period.from = Math.min(
-						DateUtils.getGlobalDay(
-							sessions.sessions[0].from * 1000
-						),
-						period.to
-					);
-					if (period.to - period.from > 28) {
-						period.from = period.to - 28;
-					}
+		if (!user) return;
+		//Adjust the period filter on the first sessions
+		const firstSessions = !user.firstDay;
+		if (firstSessions) {
+			const period = user.getFilter("period") as PeriodFilter;
+			if (!Number.isFinite(period.from) || !Number.isFinite(period.to)) {
+				period.to = DateUtils.getGlobalDay(
+					sessions.sessions[sessions.sessions.length - 1].to * 1000
+				);
+				period.from = Math.min(
+					DateUtils.getGlobalDay(sessions.sessions[0].from * 1000),
+					period.to
+				);
+				if (period.to - period.from > 28) {
+					period.from = period.to - 28;
 				}
 			}
-
-			if (this.selected == user) {
-				for (const session of sessions.sessions) {
-					user.addSession(
-						new Session(session.from, session.to, session.platform)
-					);
-				}
-			} else {
-				await this.processSessions(user, sessions.sessions);
-			}
-
-			this.call("dataupdated", user == this.selected);
 		}
+
+		if (this.selected == user) {
+			for (const session of sessions.sessions) {
+				user.addSession(
+					new Session(session.from, session.to, session.platform)
+				);
+			}
+		} else {
+			await this.processSessions(user, sessions.sessions);
+		}
+
+		this.call("dataupdated", user == this.selected);
 	}
 
 	public static addUser(id: string): void {
