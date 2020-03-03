@@ -58,6 +58,7 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 
 		const user = this.data.find(x => x.id == sessions.id);
 		if (user) {
+			//Adjust the period filter on the first sessions
 			const firstSessions = !user.firstDay;
 			if (firstSessions && sessions.sessions.length > 0) {
 				const period = user.getFilter("period") as PeriodFilter;
@@ -65,19 +66,18 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 					!Number.isFinite(period.from) ||
 					!Number.isFinite(period.to)
 				) {
-					period.from =
-						DateUtils.getGlobalDay(
-							sessions.sessions[0].from * 1000
-						) + 1;
 					period.to = DateUtils.getGlobalDay(
 						sessions.sessions[sessions.sessions.length - 1].to *
 							1000
 					);
-					if (period.from > period.to) {
-						period.from = period.to;
-					}
-					if (period.to - period.from > 30) {
-						period.from = period.to - 30;
+					period.from = Math.min(
+						DateUtils.getGlobalDay(
+							sessions.sessions[0].from * 1000
+						),
+						period.to
+					);
+					if (period.to - period.from > 28) {
+						period.from = period.to - 28;
 					}
 				}
 			}
@@ -90,13 +90,6 @@ export default class Users extends Service<"dataupdated" | "userchanged">() {
 				}
 			} else {
 				await this.processSessions(user, sessions.sessions);
-			}
-
-			if (!firstSessions && sessions.sessions.length == 0) {
-				const filter = user.getFilter("period") as PeriodFilter;
-				if (filter.from == user.firstDay + 1) {
-					filter.from = user.firstDay;
-				}
 			}
 
 			this.call("dataupdated", user == this.selected);
