@@ -17,7 +17,14 @@ module.exports = {
 		new HtmlWebpackPlugin({
 			template: "./src/index.pug"
 		}),
-		prod ? new WorkboxPlugin.GenerateSW() : () => {},
+		prod
+			? new WorkboxPlugin.GenerateSW({
+					additionalManifestEntries: [
+						"assets/model.json",
+						"assets/model.weights.bin"
+					]
+			  })
+			: () => {},
 		prod ? new WebpackCleanupPlugin() : () => {}
 	],
 	module: {
