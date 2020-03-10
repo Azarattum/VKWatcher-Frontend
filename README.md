@@ -13,7 +13,10 @@ Front end web application for processing data from VKWatcher-Backend
   - And more...
 
 ### Usage:
-Start your web server from *./dist* folder. Note that **sessions.json** is requested from */assets/* by now.
+Start your web server from *./dist* folder. 
+Sessions data is requested from the [remote API](https://github.com/Azarattum/VKWatcher-Backend).
+Your can change the API address in *./src/components/app/app.ts* file.
+
 
 ### Installation: 
 Install all dependencies:
